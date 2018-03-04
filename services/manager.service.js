@@ -1,9 +1,8 @@
 const mongoose = require('mongoose'),
       ObjectId = require('mongodb').ObjectID;
-var User       = require('../models/user');
-var Track      = require('../models/track');
+var Manager    = require('../models/managerSchema');
+var Session    = require('../models/sessionSchema');
 var ts         = require('../services/track.service');
-var jwt        = require('jsonwebtoken');
 var consts     = require('../consts.js');
 
 var service = {};
