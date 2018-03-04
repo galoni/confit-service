@@ -3,10 +3,10 @@ let mongoose = require (`mongoose`),
     sessionSchema = new schema({
         name: {type: String,required: true},
         session_type: {type: String,required: true},
-        duration:{type: float,required: true},
+        duration:{type: Number,required: true},
 
 
-    },{collection:`conference`});
+    },{collection:`session`});
 
 
 exports.Session = mongoose.model(`session`, sessionSchema);

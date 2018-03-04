@@ -2,25 +2,60 @@ const mongoose = require('mongoose'),
       ObjectId = require('mongodb').ObjectID;
 var Manager    = require('../models/managerSchema');
 var Session    = require('../models/sessionSchema');
-var ts         = require('../services/track.service');
+// var ts         = require('../services/track.service');
 var consts     = require('../consts.js');
 
 var service = {};
 
-service.login                   = login;
-service.getUserById             = getUserById;
-service.getPrefById             = getPrefById;
-service.getPlaylistsById        = getPlaylistsById;
-service.setPref                 = setPref;
-service.getUser                 = getUser;
-service.addTrackToPlaylist      = addTrackToPlaylist;
-service.addNewPlaylist          = addNewPlaylist;
-// service.removeTrackFromPlaylist = removeTrackFromPlaylist;
-service.removePlaylist          = removePlaylist;
-service.create                  = create;
+service.createSession           = createSession;
+// service.login                   = login;
+// service.getUserById             = getUserById;
+// service.getPrefById             = getPrefById;
+// service.getPlaylistsById        = getPlaylistsById;
+// service.setPref                 = setPref;
+// service.getUser                 = getUser;
+// service.addTrackToPlaylist      = addTrackToPlaylist;
+// service.addNewPlaylist          = addNewPlaylist;
+// // service.removeTrackFromPlaylist = removeTrackFromPlaylist;
+// service.removePlaylist          = removePlaylist;
+// service.create                  = create;
 // service.delete = _delete;
 
 module.exports = service;
+
+function createSession(name, session_type, duration){
+    console.log('Trace: createSession('+name+','+session_type+')');
+    return new Promise((resolve, reject) => {
+      Session.findOne({name: name},
+        (err, session) => {
+          if(err) {
+            reject({"error": err});
+            console.log('CREATE SESSION STATUS: FAILED');
+          }
+          
+          if(session) {
+            console.log("info : exist NAME");
+            return resolve({"info": " exist NAME"});
+          }
+          else{
+            console.log('CREATE SESSION STATUS: SUCCESS ' + name);
+            var newSession = new Session({
+              name : name,
+              session_type : session_type,
+              duration : duration
+            });
+            newSession.save(
+              (err) => {
+                if(err)
+                  console.log('error: ' + err);
+                else
+                  console.log("save new session");
+                  resolve();
+              });
+        }
+    });
+  });
+}
 
 function addNewPlaylist(userId, playlistName){
   console.log('Trace: addTrackToPlaylist('+userId+','+playlistName+')');

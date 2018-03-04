@@ -1,12 +1,12 @@
 var express = require('express');
 var router = express.Router();
 var managerService = require('../services/manager.service');
-var session = require('express-session');
+// var session = require('express-session');
 var Manager = require('../models/managerSchema');
 var consts = require('../consts.js');
 
 // routes
-router.post('/createConference', createConference);
+// router.post('/createConference', createConference);
 router.post('/createSession', createSession);
 
 
@@ -28,8 +28,7 @@ router.post('/createSession', createSession);
 module.exports = router;
 
 function createSession(req, res) {
-  managerService.createSession(req.body.name, req.body.session_type, 
-                              req.body.description, req.body.main_topics, req.body.duration)
+  managerService.createSession(req.body.name, req.body.session_type, req.body.duration)
       .then(function(status) {
           res.status(200).json({"status": status});
       })
