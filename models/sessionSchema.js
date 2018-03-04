@@ -9,6 +9,6 @@ let mongoose = require (`mongoose`),
     },{collection:`session`});
 
 
-exports.Session = mongoose.model(`session`, sessionSchema);
+exports.confSession = mongoose.model(`session`, sessionSchema);
 
 exports.sessionSchema=sessionSchema;

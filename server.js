@@ -1,7 +1,13 @@
 const express    = require('express'),
       app        = express(),
       bodyParser = require('body-parser'),
-      port       = process.env.PORT || 3000;
+      port = process.env.PORT || 3000;
+
+// app.configure(function(){
+//     app.use(express.methodOverride());
+//     app.use(express.bodyParser());
+//     app.use(app.router);
+// });
 
 app.set('port',port);
 app.use('/', express.static('./public')); //for API
@@ -23,7 +29,7 @@ app.get('/', (req,res) => {
 
 /*** All routes ***/
 app.use('/manager', require('./controllers/managerController'));
-app.use('/visitor', require('./controllers/visitorController'));
+// app.use('/visitor', require('./controllers/visitorController'));
 
 app.listen(port,
     () => {

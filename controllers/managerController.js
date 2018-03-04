@@ -8,6 +8,7 @@ var consts = require('../consts.js');
 // routes
 // router.post('/createConference', createConference);
 router.post('/createSession', createSession);
+router.post('/getConfSessionByName', getConfSessionByName);
 
 
 // router.post('/login', login);
@@ -35,6 +36,21 @@ function createSession(req, res) {
       .catch(function (err) {
           res.status(400).send(err);
       });
+}
+
+function getConfSessionByName(req, res){
+    managerService.getConfSessionByName(req.body.name)
+        .then(function (session_type) {
+            if (session_type) {
+                console.log("session_type:" + session_type);
+                res.send(session_type);
+            } else {
+                res.sendStatus(404);
+            }
+        })
+        .catch(function (err) {
+            res.status(400).send(err);
+        });
 }
 
 function login(req, res) {

@@ -1,14 +1,14 @@
-const mongoose = require('mongoose'),
-      ObjectId = require('mongodb').ObjectID;
-var Manager    = require('../models/managerSchema');
-var Session    = require('../models/sessionSchema');
+const mongoose  = require('mongoose'),
+      ObjectId  = require('mongodb').ObjectID;
+var Manager     = require('../models/managerSchema');
+var confSession = require('../models/sessionSchema');
 // var ts         = require('../services/track.service');
-var consts     = require('../consts.js');
+var consts      = require('../consts.js');
 
 var service = {};
 
 service.createSession           = createSession;
-// service.login                   = login;
+ service.getConfSessionByName   = getConfSessionByName;
 // service.getUserById             = getUserById;
 // service.getPrefById             = getPrefById;
 // service.getPlaylistsById        = getPlaylistsById;
@@ -26,20 +26,20 @@ module.exports = service;
 function createSession(name, session_type, duration){
     console.log('Trace: createSession('+name+','+session_type+')');
     return new Promise((resolve, reject) => {
-      Session.findOne({name: name},
+      confSession.findOne({name: name},
         (err, session) => {
           if(err) {
-            reject({"error": err});
             console.log('CREATE SESSION STATUS: FAILED');
+            reject(false);
           }
           
           if(session) {
             console.log("info : exist NAME");
-            return resolve({"info": " exist NAME"});
+            return resolve(false);
           }
           else{
             console.log('CREATE SESSION STATUS: SUCCESS ' + name);
-            var newSession = new Session({
+            var newSession = new confSession({
               name : name,
               session_type : session_type,
               duration : duration
@@ -50,10 +50,29 @@ function createSession(name, session_type, duration){
                   console.log('error: ' + err);
                 else
                   console.log("save new session");
-                  resolve();
+                  resolve(true);
               });
         }
     });
+  });
+}
+
+function getConfSessionByName(name){
+  console.log("Trace: getConfSession("+name+")");
+  return new Promise((resolve, reject) => {
+    confSession.findOne({name: name},
+      (err, session) => {
+        if(err) {
+          console.log('getConfSession STATUS: FAILED');
+          reject({"error": err});
+        }
+        console.log('getConfSession STATUS: SUCCESS');
+        if(!session) {
+          console.log("info : wrong name");
+          return resolve({"info": " wrong name"});
+        }
+        resolve(confSession.session_type);
+      });
   });
 }
 
