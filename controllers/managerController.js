@@ -9,7 +9,8 @@ var consts = require('../consts.js');
 // router.post('/createConference', createConference);
 router.post('/createSession', createSession);
 router.post('/getConfSessionByName', getConfSessionByName);
-
+router.post('/getConfById', getConfById);
+router.post('/addSessionToConf', addSessionToConf);
 
 // router.post('/login', login);
 // router.post('/register', register);
@@ -52,6 +53,36 @@ function getConfSessionByName(req, res){
             console.log("error:" + err);
             res.status(400).send(err);
         });
+}
+
+function getConfById(req, res){
+    managerService.getConfById(req.body.id)
+        .then(function (conf) {
+            if (conf) {
+                console.log("confernce:" + conf);
+                res.send(conf);
+            } else {
+                res.sendStatus(404);
+            }
+        })
+        .catch(function (err) {
+            console.log("error:" + err);
+            res.status(400).send(err);
+        });
+}
+
+function addSessionToConf(req, res) {
+  let name         = req.body.name;
+  let session_type = req.body.session_type;
+  let duration     = req.body.duration;
+  let confId     = req.body.confId; 
+  managerService.addSessionToConf(name, session_type, duration, confId)
+    .then(function(status) {
+        res.status(200).json({"status": status});
+    })
+    .catch(function (err) {
+        res.status(400).send(err);
+    });
 }
 
 function login(req, res) {

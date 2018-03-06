@@ -2,13 +2,16 @@ const mongoose  = require('mongoose'),
       ObjectId  = require('mongodb').ObjectID;
 var Manager     = require('../models/managerSchema');
 var confSession = require('../models/sessionSchema');
+var Conf        = require('../models/conferenceSchema');
 // var ts         = require('../services/track.service');
 var consts      = require('../consts.js');
 
 var service = {};
 
 service.createSession           = createSession;
- service.getConfSessionByName   = getConfSessionByName;
+service.getConfSessionByName    = getConfSessionByName;
+service.getConfById             = getConfById;
+service.addSessionToConf        = addSessionToConf;
 // service.getUserById             = getUserById;
 // service.getPrefById             = getPrefById;
 // service.getPlaylistsById        = getPlaylistsById;
@@ -26,7 +29,7 @@ module.exports = service;
 function createSession(name, session_type, duration){
   return new Promise((resolve, reject) => {
     confSession.findOne({name : name},
-      function(err, _cSession) {
+      (err, _cSession) => {
         if (err){
           console.log("error: " + err);
           reject("error");
@@ -43,74 +46,77 @@ function createSession(name, session_type, duration){
               duration : duration
             });
             console.log('CREATE SESSION STATUS: SUCCESS ' + name);
-            newSession.save(function (err, confSession, numAffected) {
+            newSession.save((err, confSession) => {
               if (err){
                 console.log("error: " + err);
                 reject("errorr");
               }
               else{
                 console.log("new session: " + confSession);
-                resolve("seccuss");
+                resolve(confSession);
               }
             })
           }
       })
   });
-  //   return new Promise((resolve, reject) => {
-  //     confSession.findOne({name: name},
-  //       (err, session) => {
-  //         if(err) {
-  //           console.log('CREATE SESSION STATUS: FAILED');
-  //           reject(false);
-  //         }
-          
-  //         if(session) {
-  //           console.log("info : exist NAME");
-  //           return resolve(false);
-  //         }
-  //         else{
-  //           console.log('CREATE SESSION STATUS: SUCCESS ' + name);
-  //           var newSession = new confSession({
-  //             name : name,
-  //             session_type : session_type,
-  //             duration : duration
-  //           });
-  //           newSession.save(
-  //             (err) => {
-  //               if(err)
-  //                 console.log('error: ' + err);
-  //               else
-  //                 console.log("save new session");
-  //                 resolve(true);
-  //             });
-  //       }
-  //   });
-  // });
 }
 
 function getConfSessionByName(name){
   console.log("Trace: getConfSessionByName("+name+")");
-  // var query = confSession.findOne({name: name});
-  // var promise = query.exec();
-  // assert.ok(promise instanceof Promise);
-
-  // promise.then(function (doc) {
-  //   console.log("doc:" + doc);
-  // });
   return new Promise((resolve, reject) => {
     confSession.findOne({name: name},
-      (err, session) => {
+      (err, _cSession) => {
         if(err) {
           console.log('getConfSessionByName STATUS: FAILED');
           reject({"error": err});
         }
         console.log('getConfSessionByName STATUS: SUCCESS');
-        if(!session) {
+        if(!_cSession) {
           console.log("info : wrong name");
           return resolve({"info": " wrong name"});
         }
-        resolve(confSession.session_type);
+        resolve(_cSession.session_type);
       });
+  });
+}
+
+function getConfById(confId){
+  return new Promise((resolve, reject) => {
+    console.log("conf id: " + confId);
+    Conf.findOne({_id: ObjectId(confId)},
+        (err, conf) => {
+          if(err) {
+            console.log('getConfById STATUS: FAILED');
+            reject(err);
+          }
+          console.log('getConfById STATUS: SUCCESS');
+          if(!conf) {
+            console.log("info : wrong conf id");
+            return resolve(err);
+          }
+          resolve(conf);
+        });
+  });
+}
+
+function addSessionToConf(name, session_type, duration, confId) {
+  console.log('Trace: addSessionToConf('+name+','+session_type+','+confId+')');
+  return new Promise((resolve, reject) => {
+    let conf = getConfById(confId).then((conf)=> {
+      this.createSession(name, session_type, duration).then ((ses) => {
+        conf.program.push(ses);
+        conf.save((err) => {
+          if(err){
+            console.log(`err: ${err}`);
+            resolve(false);
+            return;
+          }
+          else
+            console.log(`Saved document: ${conf.name}`);
+        });
+      });
+    });
+    resolve(true);
   });
 }
 
