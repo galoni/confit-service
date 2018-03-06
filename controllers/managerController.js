@@ -49,6 +49,7 @@ function getConfSessionByName(req, res){
             }
         })
         .catch(function (err) {
+            console.log("error:" + err);
             res.status(400).send(err);
         });
 }

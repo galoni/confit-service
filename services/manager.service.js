@@ -24,49 +24,87 @@ service.createSession           = createSession;
 module.exports = service;
 
 function createSession(name, session_type, duration){
-    console.log('Trace: createSession('+name+','+session_type+')');
-    return new Promise((resolve, reject) => {
-      confSession.findOne({name: name},
-        (err, session) => {
-          if(err) {
-            console.log('CREATE SESSION STATUS: FAILED');
-            reject(false);
-          }
-          
-          if(session) {
+  return new Promise((resolve, reject) => {
+    confSession.findOne({name : name},
+      function(err, _cSession) {
+        if (err){
+          console.log("error: " + err);
+          reject("error");
+        }
+        if(_cSession) {
             console.log("info : exist NAME");
             return resolve(false);
           }
           else{
-            console.log('CREATE SESSION STATUS: SUCCESS ' + name);
+            console.log('Trace: createSession('+name+','+session_type+')');
             var newSession = new confSession({
               name : name,
               session_type : session_type,
               duration : duration
             });
-            newSession.save(
-              (err) => {
-                if(err)
-                  console.log('error: ' + err);
-                else
-                  console.log("save new session");
-                  resolve(true);
-              });
-        }
-    });
+            console.log('CREATE SESSION STATUS: SUCCESS ' + name);
+            newSession.save(function (err, confSession, numAffected) {
+              if (err){
+                console.log("error: " + err);
+                reject("errorr");
+              }
+              else{
+                console.log("new session: " + confSession);
+                resolve("seccuss");
+              }
+            })
+          }
+      })
   });
+  //   return new Promise((resolve, reject) => {
+  //     confSession.findOne({name: name},
+  //       (err, session) => {
+  //         if(err) {
+  //           console.log('CREATE SESSION STATUS: FAILED');
+  //           reject(false);
+  //         }
+          
+  //         if(session) {
+  //           console.log("info : exist NAME");
+  //           return resolve(false);
+  //         }
+  //         else{
+  //           console.log('CREATE SESSION STATUS: SUCCESS ' + name);
+  //           var newSession = new confSession({
+  //             name : name,
+  //             session_type : session_type,
+  //             duration : duration
+  //           });
+  //           newSession.save(
+  //             (err) => {
+  //               if(err)
+  //                 console.log('error: ' + err);
+  //               else
+  //                 console.log("save new session");
+  //                 resolve(true);
+  //             });
+  //       }
+  //   });
+  // });
 }
 
 function getConfSessionByName(name){
-  console.log("Trace: getConfSession("+name+")");
+  console.log("Trace: getConfSessionByName("+name+")");
+  // var query = confSession.findOne({name: name});
+  // var promise = query.exec();
+  // assert.ok(promise instanceof Promise);
+
+  // promise.then(function (doc) {
+  //   console.log("doc:" + doc);
+  // });
   return new Promise((resolve, reject) => {
     confSession.findOne({name: name},
       (err, session) => {
         if(err) {
-          console.log('getConfSession STATUS: FAILED');
+          console.log('getConfSessionByName STATUS: FAILED');
           reject({"error": err});
         }
-        console.log('getConfSession STATUS: SUCCESS');
+        console.log('getConfSessionByName STATUS: SUCCESS');
         if(!session) {
           console.log("info : wrong name");
           return resolve({"info": " wrong name"});
