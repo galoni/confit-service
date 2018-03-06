@@ -11,7 +11,8 @@ router.post('/createSession', createSession);
 router.post('/getConfSessionByName', getConfSessionByName);
 router.post('/getConfById', getConfById);
 router.post('/addSessionToConf', addSessionToConf);
-
+router.post('/createLecture', createLecture);
+router.post('/addLectureToConf', addLectureToConf);
 // router.post('/login', login);
 // router.post('/register', register);
 // router.get('/logout', logout);
@@ -31,6 +32,20 @@ module.exports = router;
 
 function createSession(req, res) {
   managerService.createSession(req.body.name, req.body.session_type, req.body.duration)
+      .then(function(status) {
+          res.status(200).json({"status": status});
+      })
+      .catch(function (err) {
+          res.status(400).send(err);
+      });
+}
+
+function createLecture(req, res) {
+  let name          = req.body.name;
+  let lecturer_name = req.body.lecturer_name;
+  let duration      = req.body.duration;
+  let description   = req.body.description;
+  managerService.createLecture(name, lecturer_name, description, duration)
       .then(function(status) {
           res.status(200).json({"status": status});
       })
@@ -84,6 +99,19 @@ function addSessionToConf(req, res) {
         res.status(400).send(err);
     });
 }
+
+function addLectureToConf(req, res) {
+  let lectureId   = req.body.lectureId;
+  let confId     = req.body.confId; 
+  managerService.addLectureToConf(lectureId, confId)
+    .then(function(status) {
+        res.status(200).json({"status": status});
+    })
+    .catch(function (err) {
+        res.status(400).send(err);
+    });
+}
+
 
 function login(req, res) {
     userService.login(req.body.username, req.body.password)
