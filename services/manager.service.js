@@ -15,6 +15,7 @@ service.getConfById             = getConfById;
 service.addSessionToConf        = addSessionToConf;
 service.createLecture           = createLecture;
 service.addLectureToConf        = addLectureToConf;
+service.createConference        = createConference;
 // service.getUserById             = getUserById;
 // service.getPrefById             = getPrefById;
 // service.getPlaylistsById        = getPlaylistsById;
@@ -57,6 +58,45 @@ function createSession(name, session_type, duration){
             else{
               console.log("new session: " + confSession);
               resolve(confSession);
+            }
+          })
+        }
+      })
+  });
+}
+
+function createConference(name, type, logo, start_date, end_date, location, audience){
+  return new Promise((resolve, reject) => {
+    Conf.findOne({name : name},
+      (err, cnf) => {
+        if (err){
+          console.log("error: " + err);
+          reject("error");
+        }
+        if(cnf) {
+            console.log("info : exist NAME");
+            return resolve(false);
+        }
+        else{
+          console.log('Trace: createConference('+name+','+type+')');
+          var newConfernce = new Conf({
+            name : name,
+            type : type,
+            logo : logo,
+            start_date : start_date,
+            end_date : end_date,
+            audience : audience,
+            location : location
+          });
+          console.log('createConference STATUS: SUCCESS ' + name);
+          newConfernce.save((err, cnf) => {
+            if (err){
+              console.log("error: " + err);
+              reject("error");
+            }
+            else{
+              console.log("new conference: " + cnf);
+              resolve(cnf);
             }
           })
         }

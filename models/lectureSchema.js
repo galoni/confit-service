@@ -1,5 +1,4 @@
 let mongoose = require (`mongoose`),
-    schema = mongoose.Schema,
     lectureSchema = new mongoose.Schema({
         name: {type: String,required: true},
         lecturer_name: {type: String,required: true},

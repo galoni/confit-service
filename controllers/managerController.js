@@ -13,6 +13,7 @@ router.post('/getConfById', getConfById);
 router.post('/addSessionToConf', addSessionToConf);
 router.post('/createLecture', createLecture);
 router.post('/addLectureToConf', addLectureToConf);
+router.post('/createConference', createConference);
 // router.post('/login', login);
 // router.post('/register', register);
 // router.get('/logout', logout);
@@ -32,6 +33,23 @@ module.exports = router;
 
 function createSession(req, res) {
   managerService.createSession(req.body.name, req.body.session_type, req.body.duration)
+      .then(function(status) {
+          res.status(200).json({"status": status});
+      })
+      .catch(function (err) {
+          res.status(400).send(err);
+      });
+}
+
+function createConference(req, res) {
+  let name          = req.body.name;
+  let type          = req.body.type;
+  let logo          = req.body.logo;
+  let start_date    = req.body.start_date;
+  let end_date      = req.body.end_date;
+  let location      = req.body.location;
+  let audience      = req.body.audience;
+  managerService.createConference(name, type, logo, start_date, end_date, location, audience)
       .then(function(status) {
           res.status(200).json({"status": status});
       })

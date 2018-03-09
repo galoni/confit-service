@@ -11,6 +11,6 @@ var conferenceSchema = new mongoose.Schema({
         lectures:[],
         exhibits:[],
         program:[],
-        overall_rating: {type: Number, required: true}
+        overall_rating: { type: Number }
     });
 module.exports = mongoose.model(`conference`, conferenceSchema);
