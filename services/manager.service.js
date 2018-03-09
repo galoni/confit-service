@@ -16,6 +16,7 @@ service.addSessionToConf        = addSessionToConf;
 service.createLecture           = createLecture;
 service.addLectureToConf        = addLectureToConf;
 service.createConference        = createConference;
+service.removeSession           = removeSession;
 // service.getUserById             = getUserById;
 // service.getPrefById             = getPrefById;
 // service.getPlaylistsById        = getPlaylistsById;
@@ -40,7 +41,7 @@ function createSession(name, session_type, duration){
         }
         if(_cSession) {
             console.log("info : exist NAME");
-            return resolve(false);
+            return resolve("error : exist NAME");
         }
         else{
           console.log('Trace: createSession('+name+','+session_type+')');
@@ -114,7 +115,7 @@ function createLecture(name, lecturer_name, description, duration){
         }
         if(lct) {
             console.log("info : exist NAME");
-            return resolve(false);
+            return resolve("error : exist NAME");
         }
         else{
           console.log('Trace: createLecture('+name+','+lecturer_name+')');
@@ -159,6 +160,34 @@ function getConfSessionByName(name){
   });
 }
 
+function removeSession(confId, sessionName) {
+  console.log('Trace: removeSession('+confId+','+sessionName+')');
+  return new Promise((resolve,reject) => {
+    let conf = getConfById(confId).then((cnf)=> {
+      for(let pIndex = 0; pIndex < cnf.program.length; pIndex++) {
+        if(cnf.program[pIndex].name === sessionName) {
+          console.log(`found session: ${cnf.program[pIndex].name}`);
+          cnf.program.splice(pIndex,1);
+          cnf.save((err) => {
+            if(err) {
+              console.log(`err: ${err}`);
+              resolve(false);
+              return;
+            }
+            else {
+              console.log(`Saved document: ${cnf.name}`);
+            }   
+          });
+          resolve(true);
+          return;
+        }
+      }
+      console.log("session not found");
+      resolve("failed - session not found");
+    });
+  });
+}
+
 function getConfById(confId){
   return new Promise((resolve, reject) => {
     console.log("conf id: " + confId);
@@ -171,7 +200,7 @@ function getConfById(confId){
           console.log('getConfById STATUS: SUCCESS');
           if(!conf) {
             console.log("info : wrong conf id");
-            return resolve(err);
+            return resolve("error : wrong conf id");
           }
           resolve(conf);
         });
@@ -190,7 +219,7 @@ function getLectureById(lectureId){
           console.log('getLectureById STATUS: SUCCESS');
           if(!lct) {
             console.log("info : wrong lct id");
-            return resolve(err);
+            return resolve("info : wrong lct id");
           }
           resolve(lct);
         });
@@ -222,6 +251,13 @@ function addSessionToConf(name, session_type, duration, confId) {
   console.log('Trace: addSessionToConf('+name+','+session_type+','+confId+')');
   return new Promise((resolve, reject) => {
     let conf = getConfById(confId).then((conf)=> {
+      for(let pIndex = 0; pIndex < conf.program.length; pIndex++) {
+        if(conf.program[pIndex].name === name) {
+          console.log(`found session, TRY DIFFERENT NAMEE: ${conf.program[pIndex].name}`);
+          resolve("failed - name exist");
+          return;
+        }
+      }
       var newSession = new confSession({
         name : name,
         session_type : session_type,
@@ -231,14 +267,14 @@ function addSessionToConf(name, session_type, duration, confId) {
       conf.save((err) => {
         if(err){
           console.log(`err: ${err}`);
-          resolve(false);
+          resolve(`err: ${err}`);
           return;
         }
         else
           console.log(`Saved document: ${conf.name}`);
+          resolve(`Saved document: ${conf.name}`);
       });
     });
-    resolve(true);
   });
 }
 

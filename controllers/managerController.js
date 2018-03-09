@@ -14,6 +14,7 @@ router.post('/addSessionToConf', addSessionToConf);
 router.post('/createLecture', createLecture);
 router.post('/addLectureToConf', addLectureToConf);
 router.post('/createConference', createConference);
+router.post('/removeSession', removeSession);
 // router.post('/login', login);
 // router.post('/register', register);
 // router.get('/logout', logout);
@@ -86,6 +87,18 @@ function getConfSessionByName(req, res){
             console.log("error:" + err);
             res.status(400).send(err);
         });
+}
+
+function removeSession(req, res) {
+  let confId      = req.body.confId;
+  let sessionName = req.body.sessionName;
+  managerService.removeSession(confId, sessionName)
+    .then(function(status) {
+        res.status(200).json({"status": status});
+    })
+    .catch(function (err) {
+        res.status(400).send(err);
+    });
 }
 
 function getConfById(req, res){
