@@ -1,6 +1,5 @@
 let mongoose = require (`mongoose`),
-    schema = mongoose.Schema,
-    visitorSchema = new schema({
+    visitorSchema =new mongoose.Schema({
         name: {
           first_name: {type: String,required: true},
           last_name: {type: String,required: true},
@@ -13,9 +12,6 @@ let mongoose = require (`mongoose`),
         custome_path:[String],
         confs: [String],
         preffered_lectures: [String]
-    },{collection:`visitor`});
+    });
 
-
-exports.Visitor = mongoose.model(`visitor`, visitorSchema);
-
-exports.visitorSchema=visitorSchema;
+module.exports = mongoose.model(`visitor`, visitorSchema);
