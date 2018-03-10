@@ -29,7 +29,7 @@ app.get('/', (req,res) => {
 
 /*** All routes ***/
 app.use('/manager', require('./controllers/managerController'));
-// app.use('/visitor', require('./controllers/visitorController'));
+app.use('/visitor', require('./controllers/visitorController'));
 
 app.listen(port,
     () => {
