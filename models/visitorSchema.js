@@ -8,7 +8,7 @@ let mongoose = require (`mongoose`),
         education: {type: String,required: true},
         occupation:{type: String,required: true},
         profile_pie: {type: String},
-        current_mode:{type: String,required: true},
+        current_mode:{type: String},
         custome_path:[String],
         confs: [String],
         preffered_lectures: [String]

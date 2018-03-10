@@ -7,6 +7,7 @@ var consts      = require('../consts.js');
 var service = {};
 
 service.buildPie= buildPie;
+service.createVisitor=createVisitor;
 
 module.exports = service;
 
@@ -27,6 +28,43 @@ function buildPie(findid, conferenceid){
         resolve(visitor);
 
     });
+  });
+}
+
+function createVisitor(first_name,last_name, linkdin, education, occupation){
+  return new Promise((resolve, reject) => {
+    Visitor.findOne({linkdin : linkdin},
+      (err, visitor) => {
+        if (err){
+          console.log("error: " + err);
+          reject("error");
+        }
+        if(visitor) {
+            console.log("info : exist linkdin profile");
+            return resolve(false);
+        }
+        else{
+          console.log('Trace: createVisitor('+first_name+','+last_name+')');
+            //var newname = {first_name:first_name, last_name:last_name};
+          var newVisitor = new Visitor({
+              name :{first_name:first_name,last_name:last_name},
+              linkedin : linkdin,
+            education : education,
+            occupation : occupation
+          });
+          console.log('createVisitor STATUS: SUCCESS ' + first_name);
+          newVisitor.save((err, visitor) => {
+            if (err){
+              console.log("error: " + err);
+              reject("error");
+            }
+            else{
+              console.log("new newVisitor: " + visitor);
+              resolve(visitor);
+            }
+          })
+        }
+      })
   });
 }
 
