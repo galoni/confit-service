@@ -2,6 +2,7 @@ const mongoose  = require('mongoose'),
       ObjectId  = require('mongodb').ObjectID;
 var Visitor     = require('../models/visitorSchema');
 var ProfilePie     = require('../models/profile_pieSchema');
+var qrcodeApi   = require('./qrcodeService')
 var consts      = require('../consts.js');
 
 var service = {};
@@ -46,11 +47,17 @@ function createVisitor(first_name,last_name, linkdin, education, occupation){
         else{
           console.log('Trace: createVisitor('+first_name+','+last_name+')');
             //var newname = {first_name:first_name, last_name:last_name};
+          var qr_code = qrcodeApi.createImage(linkdin)
+          if (!qr_code){
+              console.log("failed to create qr_code");
+              reject("failed to create qr_code");
+          }
           var newVisitor = new Visitor({
               name :{first_name:first_name,last_name:last_name},
               linkedin : linkdin,
-            education : education,
-            occupation : occupation
+              education : education,
+              occupation : occupation,
+              qr_code : qr_code
           });
           console.log('createVisitor STATUS: SUCCESS ' + first_name);
           newVisitor.save((err, visitor) => {
@@ -67,6 +74,3 @@ function createVisitor(first_name,last_name, linkdin, education, occupation){
       })
   });
 }
-
-
-                            

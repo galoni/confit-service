@@ -25,7 +25,6 @@ function createStringQRCode(linkedin){
   };
 
 function createImage(linkedin){
-  return new Promise((resolve, reject) => {
     console.log("linkedin: " + linkedin);
     // Generate a v4 (random) UUID
     var filename = uuid.v4() + '.png';
@@ -38,22 +37,19 @@ function createImage(linkedin){
     }, function (err) {
       if (err) throw err
       console.log('created file for qr code')
+      return null
     })
-    resolve(filename)
-  });
+    return filename
 };
 //Deleting a QR image
 function deleteImage(filename){
-  return new Promise((resolve, reject) => {
     console.log("filename: " + filename);
     fs.unlink(filename, (err) => {
       if (err) {
-        resolve(false)
+        return false
         throw err;
       }
       console.log(filename + ' was deleted');
-      resolve(true)
+      return true
     });
-
-  });
 };

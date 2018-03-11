@@ -11,7 +11,8 @@ let mongoose = require (`mongoose`),
         current_mode:{type: String},
         custome_path:[String],
         confs: [String],
-        preffered_lectures: [String]
+        preffered_lectures: [String],
+        qr_code: {type: String}
     });
 
 module.exports = mongoose.model(`visitor`, visitorSchema);
