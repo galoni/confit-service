@@ -1,6 +1,5 @@
 let mongoose = require (`mongoose`),
-    schema = mongoose.Schema,
-    visitorSchema = new schema({
+    visitorSchema =new mongoose.Schema({
         name: {
           first_name: {type: String,required: true},
           last_name: {type: String,required: true},
@@ -9,13 +8,10 @@ let mongoose = require (`mongoose`),
         education: {type: String,required: true},
         occupation:{type: String,required: true},
         profile_pie: {type: String},
-        current_mode:{type: String,required: true},
+        current_mode:{type: String},
         custome_path:[String],
         confs: [String],
         preffered_lectures: [String]
-    },{collection:`visitor`});
+    });
 
-
-exports.Visitor = mongoose.model(`visitor`, visitorSchema);
-
-exports.visitorSchema=visitorSchema;
+module.exports = mongoose.model(`visitor`, visitorSchema);
