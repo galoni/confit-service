@@ -64,7 +64,7 @@ function createVisitor(first_name,last_name, linkdin, education, occupation){
 
 function updateProfilePie(visitorid, connection_percent,explore_percent,learn_percent) {
     var profilePie=connection_percent*0.001
-    +explore_percent*0.001+learn_percent*0.1;
+    +explore_percent*0.01+learn_percent*0.1;
   console.log("Trace: updateProfilePie("+visitorid+")");
     return new Promise((resolve, reject) => {
           var conditions = {_id: ObjectId(visitorid)},
