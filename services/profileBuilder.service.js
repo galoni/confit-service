@@ -7,31 +7,13 @@ var consts      = require('../consts.js');
 
 var service = {};
 
-service.buildPie= buildPie;
+//service.buildPie= buildPie;
 service.createVisitor=createVisitor;
 service.updateProfilePie=updateProfilePie;
 
 module.exports = service;
 
-function buildPie(findid, conferenceid){
-    return new Promise((resolve, reject) => {
-    console.log("visitor id: " + findid);
-      Visitor.findOne({_id: ObjectId(findid)},
-        (err, visitor) => {
-          if(err) {
-            console.log('BUILD PIE STATUS: FAILED');
-            reject(err);
-          }
-        console.log('buildPie STATUS: SUCCESS');
-          if(!visitor) {
-            console.log("info : id was not found ");
-            return resolve("error : wrong visitor id");
-          }
-        resolve(visitor);
 
-    });
-  });
-}
 
 function createVisitor(first_name,last_name, linkdin, education, occupation){
   return new Promise((resolve, reject) => {
@@ -81,10 +63,13 @@ function createVisitor(first_name,last_name, linkdin, education, occupation){
 }
 
 function updateProfilePie(visitorid, connection_percent,explore_percent,learn_percent) {
+    var profilePie=connection_percent*0.001
+    +explore_percent*0.001+learn_percent*0.1;
   console.log("Trace: updateProfilePie("+visitorid+")");
     return new Promise((resolve, reject) => {
           var conditions = {_id: ObjectId(visitorid)},
-          update = {'connection_percent':connection_percent,
+          update = {'profile_pie':profilePie,
+                    'connection_percent':connection_percent,
                     'explore_percent':explore_percent,
                     'learn_percent':learn_percent
                     },
@@ -101,3 +86,4 @@ function updateProfilePie(visitorid, connection_percent,explore_percent,learn_pe
           resolve(true);
     });
 }
+
