@@ -24,21 +24,29 @@ function createStringQRCode(linkedin){
     });
   };
 
-function createImage(linkedin){
-    console.log("linkedin: " + linkedin);
+function createImage(data, type){
+    console.log("creating qr code image with the content:\ntype: " + type + "\ndata: " + data);
+    if (!data || !type){
+      console.log("not enough arguments passed");
+      return null
+    }
     // Generate a v4 (random) UUID
     var filename = uuid.v4() + '.png';
+    var qrjson = {
+      type: type,
+      data: data
+    }
     // filename -> '110ec58a-a0f2-4ac4-8393-c866d813b8d1'
-    var qr = QRCode.toFile(consts.QRCODELIB + filename, linkedin, {
+    var qr = QRCode.toFile(consts.QRCODELIB + filename, JSON.stringify(qrjson), {
       color: {
         dark: '#02729a',  // Blue dots
         light: '#0000' // Transparent background
       }
     }, function (err) {
       if (err) throw err
-      console.log('created file for qr code')
       return null
     })
+    console.log('created file for qr code')
     return filename
 };
 //Deleting a QR image

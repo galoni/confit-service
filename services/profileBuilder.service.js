@@ -47,7 +47,7 @@ function createVisitor(first_name,last_name, linkdin, education, occupation){
         else{
           console.log('Trace: createVisitor('+first_name+','+last_name+')');
             //var newname = {first_name:first_name, last_name:last_name};
-          var qr_code = qrcodeApi.createImage(linkdin)
+          var qr_code = qrcodeApi.createImage(linkdin, 'visitor')
           if (!qr_code){
               console.log("failed to create qr_code");
               reject("failed to create qr_code");
