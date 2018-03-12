@@ -9,6 +9,7 @@ var service = {};
 
 service.buildPie= buildPie;
 service.createVisitor=createVisitor;
+service.updateProfilePie=updateProfilePie;
 
 module.exports = service;
 
@@ -57,6 +58,10 @@ function createVisitor(first_name,last_name, linkdin, education, occupation){
               linkedin : linkdin,
               education : education,
               occupation : occupation,
+              profile_pie:0,
+              connection_percent:0.3,
+              explore_percent:0.3,
+              learn_percent:0.3,
               qr_code : qr_code
           });
           console.log('createVisitor STATUS: SUCCESS ' + first_name);
@@ -73,4 +78,26 @@ function createVisitor(first_name,last_name, linkdin, education, occupation){
         }
       })
   });
+}
+
+function updateProfilePie(visitorid, connection_percent,explore_percent,learn_percent) {
+  console.log("Trace: updateProfilePie("+visitorid+")");
+    return new Promise((resolve, reject) => {
+          var conditions = {_id: ObjectId(visitorid)},
+          update = {'connection_percent':connection_percent,
+                    'explore_percent':explore_percent,
+                    'learn_percent':learn_percent
+                    },
+          opts = {new:true};
+          Visitor.update(conditions, update, opts,
+            (err) => {
+                if(err) {
+                  reject({"error": err});
+                  console.log('updateProfilePie STATUS: FAILED' + err);
+                } else{
+                  console.log(`updateProfilePie STATUS: SUCCESS`);
+                }
+            });
+          resolve(true);
+    });
 }
