@@ -10,10 +10,30 @@ var service = {};
 //service.buildPie= buildPie;
 service.createVisitor=createVisitor;
 service.updateProfilePie=updateProfilePie;
+service.updatePreffered_lectures=updatePreffered_lectures;
+service.getPie=getPie;
 
 module.exports = service;
 
 
+function getPie(visitorid){
+  return new Promise((resolve, reject) => {
+    console.log("visitor id: " + visitorid);
+    Visitor.findOne({_id: ObjectId(visitorid)},
+        (err, visitor) => {
+          if(err) {
+            console.log('getPie STATUS: FAILED');
+            reject(err);
+          }
+          console.log('getPie STATUS: SUCCESS');
+          if(!pie) {
+            console.log("info : wrong visitor id");
+            return resolve("info : wrong visitor id");
+          }
+          resolve(visitor.profile_pie);
+        });
+  });
+}
 
 function createVisitor(first_name,last_name, linkdin, education, occupation){
   return new Promise((resolve, reject) => {
@@ -72,6 +92,33 @@ function updateProfilePie(visitorid, connection_percent,explore_percent,learn_pe
                     'connection_percent':connection_percent,
                     'explore_percent':explore_percent,
                     'learn_percent':learn_percent
+                    },
+          opts = {new:true};
+          Visitor.update(conditions, update, opts,
+            (err) => {
+                if(err) {
+                  reject({"error": err});
+                  console.log('updateProfilePie STATUS: FAILED' + err);
+                } else{
+                  console.log(`updateProfilePie STATUS: SUCCESS`);
+                }
+            });
+          resolve(true);
+    });
+}
+
+function updatePreffered_lectures
+(visitorid, lecture1,lecture2,lecture3) {
+  console.log("Trace: updatePreffered_lectures("+visitorid+")");
+    var preffered_lectures=[];
+    preffered_lectures.push(lecture1);
+    preffered_lectures.push(lecture2);
+    preffered_lectures.push(lecture3);
+    
+    return new Promise((resolve, reject) => {
+          var conditions = {_id: ObjectId(visitorid)},
+          update = {
+                    'preffered_lectures':preffered_lectures
                     },
           opts = {new:true};
           Visitor.update(conditions, update, opts,

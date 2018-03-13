@@ -4,14 +4,15 @@ var visitorService = require('../services/profileBuilder.service');
 var Visitor = require('../models/visitorSchema');
 var consts = require('../consts.js');
 
-router.post('/buildPie', buildPie);
+//router.post('/buildPie', buildPie);
 router.post('/createVisitor', createVisitor);
 router.post('/updateProfilePie', updateProfilePie);
+router.post('/updatePreffered_lectures', updatePreffered_lectures);
 
 module.exports = router;
 
 
-function buildPie(req, res) {
+/*function buildPie(req, res) {
   visitorService.buildPie(req.body.visitorid, req.body.conferenceid)
       .then(function(status) {
           res.status(200).json({"status": status});
@@ -19,7 +20,7 @@ function buildPie(req, res) {
       .catch(function (err) {
           res.status(400).send(err);
       });
-}
+}*/
 
 
 function createVisitor(req, res) {
@@ -31,8 +32,20 @@ function createVisitor(req, res) {
           res.status(400).send(err);
       });
 }
+
+
 function updateProfilePie(req, res) {
   visitorService.updateProfilePie(req.body.visitorid, req.body.connection_percent,req.body.explore_percent,req.body.learn_percent)
+      .then(function(status) {
+          res.status(200).json({"status": status});
+      })
+      .catch(function (err) {
+          res.status(400).send(err);
+      });
+}
+
+function updatePreffered_lectures(req, res) {
+  visitorService.updatePreffered_lectures(req.body.visitorid, req.body.lecture1,req.body.lecture2,req.body.lecture3)
       .then(function(status) {
           res.status(200).json({"status": status});
       })
