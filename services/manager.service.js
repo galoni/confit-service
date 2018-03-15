@@ -231,6 +231,13 @@ function addLectureToConf(lectureId, confId) {
   return new Promise((resolve, reject) => {
     let conf = getConfById(confId).then((conf)=> {
       let _lecture = getLectureById(lectureId).then((lct) => {
+        for(let pIndex = 0; pIndex < conf.lectures.length; pIndex++) {
+          if(conf.lectures[pIndex].name === lct.name) {
+            console.log(`found lecture: ${conf.lectures[pIndex].name}`);
+            reject("failed - lecture exist in the conf");
+            return;
+          }
+        }
         conf.lectures.push(lct);
         conf.save((err) => {
           if(err){
@@ -238,12 +245,13 @@ function addLectureToConf(lectureId, confId) {
             resolve(false);
             return;
           }
-          else
+          else{
             console.log(`Saved document: ${conf.name}`);
+            resolve("conf.lectures");
+          }
         });  
       })
     });
-    resolve(true);
   });
 }
 
@@ -270,9 +278,10 @@ function addSessionToConf(name, session_type, duration, confId) {
           resolve(`err: ${err}`);
           return;
         }
-        else
+        else {
           console.log(`Saved document: ${conf.name}`);
           resolve(`Saved document: ${conf.name}`);
+        }
       });
     });
   });
