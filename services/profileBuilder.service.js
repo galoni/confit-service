@@ -9,14 +9,16 @@ var service = {};
 
 //service.buildPie= buildPie;
 service.createVisitor=createVisitor;
-service.updateProfilePie=updateProfilePie;
-service.updatePreffered_lectures=updatePreffered_lectures;
-service.getPie=getPie;
+service.registerToConf=registerToConf;
+//service.getConfsVisitor=getConfsVisitor;
+//service.updateProfilePie=updateProfilePie;
+//service.updatePreffered_lectures=updatePreffered_lectures;
+//service.getPie=getPie;
 
 module.exports = service;
 
 
-function getPie(visitorid){
+/*function getPie(visitorid){
   return new Promise((resolve, reject) => {
     console.log("visitor id: " + visitorid);
     Visitor.findOne({_id: ObjectId(visitorid)},
@@ -33,7 +35,7 @@ function getPie(visitorid){
           resolve(visitor.profile_pie);
         });
   });
-}
+}*/
 
 function createVisitor(first_name,last_name, linkdin, education, occupation){
   return new Promise((resolve, reject) => {
@@ -60,10 +62,10 @@ function createVisitor(first_name,last_name, linkdin, education, occupation){
               linkedin : linkdin,
               education : education,
               occupation : occupation,
-              profile_pie:0,
-              connection_percent:0.3,
-              explore_percent:0.3,
-              learn_percent:0.3,
+              //profile_pie:0,
+              //connection_percent:0.3,
+              //explore_percent:0.3,
+              //learn_percent:0.3,
               qr_code : qr_code
           });
           console.log('createVisitor STATUS: SUCCESS ' + first_name);
@@ -82,7 +84,38 @@ function createVisitor(first_name,last_name, linkdin, education, occupation){
   });
 }
 
-function updateProfilePie(visitorid, connection_percent,explore_percent,learn_percent) {
+function registerToConf
+(visitorid, confid,connection_percent,explore_percent,learn_percent) {
+  console.log("Trace: registerToConf("+confid+") by visitor: ("+visitorid+")");
+    var profilePie=connection_percent*0.001
+    +explore_percent*0.01+learn_percent*0.1;
+    var confs=[];
+    confs.push({"confId":confid,
+               "connection_percent":connection_percent,
+               "explore_percent":explore_percent,
+               "learn_percent":learn_percent,
+               "profile_pie":profilePie,
+               "preffered_lectures":[]})
+    return new Promise((resolve, reject) => {
+          var conditions = {_id: ObjectId(visitorid)},
+          update = {
+                    'confs':confs
+                    },
+          opts = {new:true};
+          Visitor.update(conditions, update, opts,
+            (err) => {
+                if(err) {
+                  reject({"error": err});
+                  console.log('updateProfilePie STATUS: FAILED' + err);
+                } else{
+                  console.log(`updateProfilePie STATUS: SUCCESS`);
+                }
+            });
+          resolve(true);
+    });
+}
+
+/*function updateProfilePie(visitorid, connection_percent,explore_percent,learn_percent) {
     var profilePie=connection_percent*0.001
     +explore_percent*0.01+learn_percent*0.1;
   console.log("Trace: updateProfilePie("+visitorid+")");
@@ -105,18 +138,18 @@ function updateProfilePie(visitorid, connection_percent,explore_percent,learn_pe
             });
           resolve(true);
     });
-}
+}*/
 
-function updatePreffered_lectures
-(visitorid, lecture1,lecture2,lecture3) {
-  console.log("Trace: updatePreffered_lectures("+visitorid+")");
+/*function updatePreffered_lectures
+(visitorid,confid, lecture1,lecture2,lecture3) {
+  console.log("Trace: updatePreffered_lectures("+visitorid+") To conference id ("+confid+")");
     var preffered_lectures=[];
     preffered_lectures.push(lecture1);
     preffered_lectures.push(lecture2);
     preffered_lectures.push(lecture3);
     
     return new Promise((resolve, reject) => {
-          var conditions = {_id: ObjectId(visitorid)},
+          var conditions = ({_id: ObjectId(visitorid)},{confs.confId: confid}),
           update = {
                     'preffered_lectures':preffered_lectures
                     },
@@ -132,5 +165,55 @@ function updatePreffered_lectures
             });
           resolve(true);
     });
+}*/
+
+
+/*function updatePreffered_lectures
+(visitorid,confid, lecture1,lecture2,lecture3) {
+  console.log("Trace: updatePreffered_lectures("+visitorid+") To conference id ("+confid+")");
+    var preffered_lectures=[];
+    preffered_lectures.push(lecture1);
+    preffered_lectures.push(lecture2);
+    preffered_lectures.push(lecture3);
+  return new Promise((resolve, reject) => {
+    let conf = getConfsVisitor(visitorid).then((confArray)=> {
+        for(let pIndex = 0; pIndex < confArray.length; pIndex++) {
+          if(conf[pIndex].confId === confid) {
+            console.log(`found conf`);
+            confArray[pIndex].preffered_lectures.push(preffered_lectures);
+            return;
+          }
+        }
+        confArray.save((err) => {
+          if(err){
+            console.log(`err: ${err}`);
+            resolve(false);
+            return;
+          }
+          else{
+            console.log(`Saved document`);
+            resolve("true");
+          }
+        });  
+    });
+  });
 }
 
+function getConfsVisitor(visitorid){
+  return new Promise((resolve, reject) => {
+    console.log("visitor id: " + visitorid);
+    Visitor.findOne({_id: ObjectId(visitorid)},
+        (err, visitor) => {
+          if(err) {
+            console.log('getConfsVisitor STATUS: FAILED');
+            reject(err);
+          }
+          console.log('getConfsVisitor STATUS: SUCCESS');
+          if(!lct) {
+            console.log("info : wrong visitor id");
+            return resolve("info : wrong visitor id");
+          }
+          resolve(visitor.confs);
+        });
+  });
+}*/
