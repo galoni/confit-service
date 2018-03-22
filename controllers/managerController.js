@@ -1,9 +1,9 @@
-var express = require('express');
-var router = express.Router();
-var managerService = require('../services/manager.service');
+const express = require('express');
+const router = express.Router();
+const managerService = require('../services/manager.service');
 // var session = require('express-session');
-var Manager = require('../models/managerSchema');
-var consts = require('../consts.js');
+const Manager = require('../models/managerSchema');
+const consts = require('../consts.js');
 
 // routes
 // router.post('/createConference', createConference);
@@ -15,6 +15,7 @@ router.post('/createLecture', createLecture);
 router.post('/addLectureToConf', addLectureToConf);
 router.post('/createConference', createConference);
 router.post('/removeSession', removeSession);
+router.post('/removeLecture', removeLecture);
 // router.post('/login', login);
 // router.post('/register', register);
 // router.get('/logout', logout);
@@ -99,6 +100,18 @@ function removeSession(req, res) {
     .catch(function (err) {
         res.status(400).send(err);
     });
+}
+
+function removeLecture(req, res) {
+    let confId      = req.body.confId;
+    let lectureName = req.body.lectureName;
+    managerService.removeLecture(confId, lectureName)
+        .then(function(status) {
+            res.status(200).json({"status": status});
+        })
+        .catch(function (err) {
+            res.status(400).send(err);
+        });
 }
 
 function getConfById(req, res){

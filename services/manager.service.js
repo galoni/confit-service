@@ -1,15 +1,15 @@
 const mongoose  = require('mongoose'),
       ObjectId  = require('mongodb').ObjectID;
-var Manager     = require('../models/managerSchema');
-var confSession = require('../models/sessionSchema');
-var lecture     = require('../models/lectureSchema');
-var Conf        = require('../models/conferenceSchema');
+const Manager     = require('../models/managerSchema');
+const confSession = require('../models/sessionSchema');
+const lecture     = require('../models/lectureSchema');
+const Conf        = require('../models/conferenceSchema');
 // var ts         = require('../services/track.service');
-var consts      = require('../consts.js');
+const consts      = require('../consts.js');
 
-var service = {};
+let service = {};
 
-service.createSession           = createSession;
+// service.createSession           = createSession;
 service.getConfSessionByName    = getConfSessionByName;
 service.getConfById             = getConfById;
 service.addSessionToConf        = addSessionToConf;
@@ -17,54 +17,44 @@ service.createLecture           = createLecture;
 service.addLectureToConf        = addLectureToConf;
 service.createConference        = createConference;
 service.removeSession           = removeSession;
-// service.getUserById             = getUserById;
-// service.getPrefById             = getPrefById;
-// service.getPlaylistsById        = getPlaylistsById;
-// service.setPref                 = setPref;
-// service.getUser                 = getUser;
-// service.addTrackToPlaylist      = addTrackToPlaylist;
-// service.addNewPlaylist          = addNewPlaylist;
-// // service.removeTrackFromPlaylist = removeTrackFromPlaylist;
-// service.removePlaylist          = removePlaylist;
-// service.create                  = create;
-// service.delete = _delete;
+service.removeLecture           = removeLecture;
 
 module.exports = service;
 
-function createSession(name, session_type, duration){
-  return new Promise((resolve, reject) => {
-    confSession.findOne({name : name},
-      (err, _cSession) => {
-        if (err){
-          console.log("error: " + err);
-          reject("error");
-        }
-        if(_cSession) {
-            console.log("info : exist NAME");
-            return resolve("error : exist NAME");
-        }
-        else{
-          console.log('Trace: createSession('+name+','+session_type+')');
-          var newSession = new confSession({
-            name : name,
-            session_type : session_type,
-            duration : duration
-          });
-          console.log('CREATE SESSION STATUS: SUCCESS ' + name);
-          newSession.save((err, confSession) => {
-            if (err){
-              console.log("error: " + err);
-              reject("errorr");
-            }
-            else{
-              console.log("new session: " + confSession);
-              resolve(confSession);
-            }
-          })
-        }
-      })
-  });
-}
+// function createSession(name, session_type, duration){
+//   return new Promise((resolve, reject) => {
+//     confSession.findOne({name : name},
+//       (err, _cSession) => {
+//         if (err){
+//           console.log("error: " + err);
+//           reject("error");
+//         }
+//         if(_cSession) {
+//             console.log("info : exist NAME");
+//             return resolve("error : exist NAME");
+//         }
+//         else{
+//           console.log('Trace: createSession('+name+','+session_type+')');
+//           let newSession = new confSession({
+//             name : name,
+//             session_type : session_type,
+//             duration : duration
+//           });
+//           console.log('CREATE SESSION STATUS: SUCCESS ' + name);
+//           newSession.save((err, confSession) => {
+//             if (err){
+//               console.log("error: " + err);
+//               reject("errorr");
+//             }
+//             else{
+//               console.log("new session: " + confSession);
+//               resolve(confSession);
+//             }
+//           })
+//         }
+//       })
+//   });
+// }
 
 function createConference(name, type, logo, start_date, end_date, location, audience){
   return new Promise((resolve, reject) => {
@@ -80,7 +70,7 @@ function createConference(name, type, logo, start_date, end_date, location, audi
         }
         else{
           console.log('Trace: createConference('+name+','+type+')');
-          var newConfernce = new Conf({
+            let newConfernce = new Conf({
             name : name,
             type : type,
             logo : logo,
@@ -119,7 +109,7 @@ function createLecture(name, lecturer_name, description, duration){
         }
         else{
           console.log('Trace: createLecture('+name+','+lecturer_name+')');
-          var newLecture = new lecture({
+            let newLecture = new lecture({
             name : name,
             lecturer_name : lecturer_name,
             description : description,
@@ -132,7 +122,7 @@ function createLecture(name, lecturer_name, description, duration){
               reject("error");
             }
             else{
-              console.log("new session: " + lct);
+              console.log("new lcture: " + lct);
               resolve(lct);
             }
           })
@@ -172,7 +162,6 @@ function removeSession(confId, sessionName) {
             if(err) {
               console.log(`err: ${err}`);
               resolve(false);
-              return;
             }
             else {
               console.log(`Saved document: ${cnf.name}`);
@@ -243,16 +232,42 @@ function addLectureToConf(lectureId, confId) {
           if(err){
             console.log(`err: ${err}`);
             resolve(false);
-            return;
           }
           else{
             console.log(`Saved document: ${conf.name}`);
-            resolve("conf.lectures");
+            resolve(conf.lectures);
           }
         });  
       })
     });
   });
+}
+
+function removeLecture(confId, lectureName) {
+    console.log('Trace: removeLecture('+confId+','+lectureName+')');
+    return new Promise((resolve,reject) => {
+        let conf = getConfById(confId).then((cnf)=> {
+            for(let pIndex = 0; pIndex < cnf.lectures.length; pIndex++) {
+                if(cnf.lectures[pIndex].name === lectureName) {
+                    console.log(`found lecture: ${cnf.lectures[pIndex].name}`);
+                    cnf.lectures.splice(pIndex,1);
+                    cnf.save((err) => {
+                        if(err) {
+                            console.log(`err: ${err}`);
+                            reject(err);
+                        }
+                        else {
+                            console.log(`lecture remove: ${cnf.lectures}`);
+                        }
+                    });
+                    resolve(cnf.lectures);
+                    return;
+                }
+            }
+            console.log("lecture not found");
+            resolve("failed - lecture not found");
+        });
+    });
 }
 
 function addSessionToConf(name, session_type, duration, confId) {
@@ -266,7 +281,7 @@ function addSessionToConf(name, session_type, duration, confId) {
           return;
         }
       }
-      var newSession = new confSession({
+      let newSession = new confSession({
         name : name,
         session_type : session_type,
         duration : duration
@@ -276,7 +291,6 @@ function addSessionToConf(name, session_type, duration, confId) {
         if(err){
           console.log(`err: ${err}`);
           resolve(`err: ${err}`);
-          return;
         }
         else {
           console.log(`Saved document: ${conf.name}`);
