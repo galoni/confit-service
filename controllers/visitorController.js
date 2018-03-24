@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var visitorService = require('../services/profileBuilder.service');
+var pathBuilderService = require('../services/pathBuilder.service');
 var Visitor = require('../models/visitorSchema');
 var consts = require('../consts.js');
 
@@ -11,6 +12,7 @@ router.post('/createVisitor', createVisitor);
 router.post('/updateProfilePie', updateProfilePie);
 router.post('/updatePreffered_lectures', updatePreffered_lectures);
 router.post('/getConfsVisitor', getConfsVisitor);
+router.post('/buildPath', buildPath);
 
 module.exports = router;
 
@@ -69,6 +71,16 @@ function getConfsVisitor(req, res) {
 
 function updatePreffered_lectures(req, res) {
   visitorService.updatePreffered_lectures(req.body.visitorid,req.body.confid,req.body.lecture1,req.body.lecture2,req.body.lecture3)
+      .then(function(status) {
+          res.status(200).json({"status": status});
+      })
+      .catch(function (err) {
+          res.status(400).send(err);
+      });
+}
+
+function buildPath(req, res) {
+  pathBuilderService.buildPath()
       .then(function(status) {
           res.status(200).json({"status": status});
       })
