@@ -1,17 +1,10 @@
 const mongoose  = require('mongoose'),
       ObjectId  = require('mongodb').ObjectID;
-<<<<<<< HEAD
 var Manager     = require('../models/managerSchema');
 var confSession = require('../models/sessionSchema');
 var lecture     = require('../models/lectureSchema');
 var Conf        = require('../models/conferenceSchema');
 var qrcodeApi   = require('./qrcodeService')
-=======
-const Manager     = require('../models/managerSchema');
-const confSession = require('../models/sessionSchema');
-const lecture     = require('../models/lectureSchema');
-const Conf        = require('../models/conferenceSchema');
->>>>>>> origin/master
 // var ts         = require('../services/track.service');
 const consts      = require('../consts.js');
 
