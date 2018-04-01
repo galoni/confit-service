@@ -23,12 +23,19 @@ module.exports = service;
 function buildPath(){
   var path = new Path(variables);
   path.insertByPref(function (err, result){
-  if (err){
-    console.log("Could not build by preffered lectures:\n" + err);
-    reject(err);
-  }
-  console.log("insertByPref: %j", result);
-});
+    if (err){
+      console.log("Could not build by preffered lectures:\n" + err);
+      reject(err);
+    }
+    console.log("insertByPref: %j", result);
+    });
+  path.insertByTopic(function (err, result){
+    if (err){
+      console.log("Could not build by main topics:\n" + err);
+      reject(err);
+    }
+    console.log("insertByTopic: %j", result);
+    });
   return new Promise((resolve, reject) => {
     //console.log(variables);
     var conf = variables["conf"];
