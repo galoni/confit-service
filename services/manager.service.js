@@ -70,11 +70,6 @@ function createConference(name, type, logo, start_date, end_date, location, audi
             return resolve(false);
         }
         else{
-          var qr_code = qrcodeApi.createImage(name, 'conference')
-          if (!qr_code){
-              console.log("failed to create qr_code");
-              reject("failed to create qr_code");
-          }
           console.log('Trace: createConference('+name+','+type+')');
             let newConfernce = new Conf({
             name : name,
@@ -84,7 +79,7 @@ function createConference(name, type, logo, start_date, end_date, location, audi
             end_date : end_date,
             audience : audience,
             location : location,
-            qr_code : qr_code
+            qr_code : ''
           });
           console.log('createConference STATUS: SUCCESS ' + name);
           newConfernce.save((err, cnf) => {
@@ -93,6 +88,22 @@ function createConference(name, type, logo, start_date, end_date, location, audi
               reject("error");
             }
             else{
+              var qr_code = qrcodeApi.createImage(cnf["_id"],cnf["name"], 'conference')
+              if (!qr_code){
+                  console.log("failed to create qr_code");
+                  reject("failed to create qr_code");
+              }
+              doc = {
+                qr_code: qr_code
+              }
+              Conf.update({_id: cnf["_id"]}, doc, function(err, raw) {
+                if (err){
+                  reject ("could not update qr_code")
+                }
+                else{
+                  console.log("Added qr_code to "+ cnf["_id"]);
+                }
+              })
               console.log("new conference: " + cnf);
               resolve(cnf);
             }
