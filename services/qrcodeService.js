@@ -25,9 +25,9 @@ function createStringQRCode(linkedin){
     });
   };
 
-function createImage(data, type){
-    console.log("creating qr code image with the content:\ntype: " + type + "\ndata: " + data);
-    if (!data || !type){
+function createImage(id, data, type){
+    console.log("creating qr code image with the content:\ntype: " + type + "\ndata: " + data + "\nid: " + id);
+    if (!data || !type || !id){
       console.log("not enough arguments passed");
       return null
     }
@@ -35,7 +35,8 @@ function createImage(data, type){
     var filename = uuid.v4() + '.png';
     var qrjson = {
       type: type,
-      data: data
+      data: data,
+      id: id
     }
     // filename -> '110ec58a-a0f2-4ac4-8393-c866d813b8d1'
     var qr = QRCode.toFile(consts.QRCODELIB + filename, JSON.stringify(qrjson), {

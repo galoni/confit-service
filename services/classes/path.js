@@ -33,7 +33,7 @@ class Path {
   //this algorythm takes the visitor's preffered lectures and add them to the path while considering the visitor's profile pie
   insertByPref(next) {
     var lecturesLength = this.conf["lectures"].length;
-    var prefferedLength = this.visitor["preffered_lectures"].length
+    var prefferedLength = this.visitor["preffered_lectures"].length;
     console.log("Starting to build by the visitor's preffered Lectures");
     if (this.visitor["preffered_lectures"] === undefined || this.visitor["preffered_lectures"].length == 0) {
       console.log("Visitor has no preffered lectures");

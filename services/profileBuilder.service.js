@@ -52,11 +52,6 @@ function createVisitor(first_name,last_name, linkdin, education, occupation){
         else{
           console.log('Trace: createVisitor('+first_name+','+last_name+')');
             //var newname = {first_name:first_name, last_name:last_name};
-          var qr_code = qrcodeApi.createImage(linkdin, 'visitor')
-          if (!qr_code){
-              console.log("failed to create qr_code");
-              reject("failed to create qr_code");
-          }
           var newVisitor = new Visitor({
               name :{first_name:first_name,last_name:last_name},
               linkedin : linkdin,
@@ -66,7 +61,7 @@ function createVisitor(first_name,last_name, linkdin, education, occupation){
               //connection_percent:0.3,
               //explore_percent:0.3,
               //learn_percent:0.3,
-              qr_code : qr_code
+              qr_code : ''
           });
           console.log('createVisitor STATUS: SUCCESS ' + first_name);
           newVisitor.save((err, visitor) => {
@@ -75,6 +70,22 @@ function createVisitor(first_name,last_name, linkdin, education, occupation){
               reject("error");
             }
             else{
+              var qr_code = qrcodeApi.createImage(visitor["_id"],visitor["linkedin"], 'visitor')
+              if (!qr_code){
+                  console.log("failed to create qr_code");
+                  reject("failed to create qr_code");
+              }
+              doc = {
+                qr_code: qr_code
+              }
+              Visitor.update({_id: visitor["_id"]}, doc, function(err, raw) {
+                if (err){
+                  reject ("could not update qr_code")
+                }
+                else{
+                  console.log("Added qr_code to "+ visitor["_id"]);
+                }
+              })
               console.log("new newVisitor: " + visitor);
               resolve(visitor);
             }
