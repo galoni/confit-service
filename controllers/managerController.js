@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const managerService = require('../services/manager.service');
+const programBuilderService = require('../services/programBuilder.service');
 // var session = require('express-session');
 const Manager = require('../models/managerSchema');
 const consts = require('../consts.js');
@@ -16,6 +17,7 @@ router.post('/addLectureToConf', addLectureToConf);
 router.post('/createConference', createConference);
 router.post('/removeSession', removeSession);
 router.post('/removeLecture', removeLecture);
+router.post('/buildProgram', buildProgram);
 // router.post('/login', login);
 // router.post('/register', register);
 // router.get('/logout', logout);
@@ -65,7 +67,8 @@ function createLecture(req, res) {
   let lecturer_name = req.body.lecturer_name;
   let duration      = req.body.duration;
   let description   = req.body.description;
-  managerService.createLecture(name, lecturer_name, description, duration)
+  let ratings       = req.body.ratings;
+  managerService.createLecture(name, lecturer_name, description, duration, ratings)
       .then(function(status) {
           res.status(200).json({"status": status});
       })
@@ -134,8 +137,10 @@ function addSessionToConf(req, res) {
   let name         = req.body.name;
   let session_type = req.body.session_type;
   let duration     = req.body.duration;
-  let confId     = req.body.confId; 
-  managerService.addSessionToConf(name, session_type, duration, confId)
+  let confId     = req.body.confId;
+  let dayNum     = req.body.dayNum;
+  let time     = req.body.time;
+    managerService.addSessionToConf(name, session_type, duration, dayNum, time, confId)
     .then(function(status) {
         res.status(200).json({"status": status});
     })
@@ -156,6 +161,16 @@ function addLectureToConf(req, res) {
     });
 }
 
+function buildProgram(req, res) {
+    let confId     = req.body.confId;
+    programBuilderService.buildProgram(confId)
+        .then(function(status) {
+            res.status(200).json({"status": status});
+        })
+        .catch(function (err) {
+            res.status(400).send(err);
+        });
+}
 
 function login(req, res) {
     userService.login(req.body.username, req.body.password)

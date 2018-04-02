@@ -120,7 +120,7 @@ function createLecture(name, lecturer_name, description, duration){
             name : name,
             lecturer_name : lecturer_name,
             description : description,
-            duration : duration
+            duration : duration,
           });
           console.log('CREATE LECTURE STATUS: SUCCESS ' + name);
           newLecture.save((err, lct) => {
@@ -277,7 +277,7 @@ function removeLecture(confId, lectureName) {
     });
 }
 
-function addSessionToConf(name, session_type, duration, confId) {
+function addSessionToConf(name, session_type, duration, dayNum, time, confId) {
   console.log('Trace: addSessionToConf('+name+','+session_type+','+confId+')');
   return new Promise((resolve, reject) => {
     let conf = getConfById(confId).then((conf)=> {
@@ -291,7 +291,9 @@ function addSessionToConf(name, session_type, duration, confId) {
       let newSession = new confSession({
         name : name,
         session_type : session_type,
-        duration : duration
+        duration : duration,
+        dayNum : dayNum,
+        time : time,
       });
       conf.program.push(newSession);
       conf.save((err) => {
@@ -300,8 +302,8 @@ function addSessionToConf(name, session_type, duration, confId) {
           resolve(`err: ${err}`);
         }
         else {
-          console.log(`Saved document: ${conf.name}`);
-          resolve(`Saved document: ${conf.name}`);
+          console.log(`Saved document: ${conf.program}`);
+          resolve(`Saved document: ${conf.program}`);
         }
       });
     });
