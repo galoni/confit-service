@@ -2,7 +2,10 @@ var mongoose = require (`mongoose`);
 var confSession = new mongoose.Schema({
     name: { type: String },
     session_type: { type: String },
-    duration:{ type: Number }
+    dayNum : { type: Number },
+    time : { type: Number },
+    duration:{ type: Number },
+    lectures: []
 });
 
 module.exports = mongoose.model('session', confSession);

@@ -6,7 +6,7 @@ let mongoose = require (`mongoose`),
         description:{type: String,required: true},
         topic: [],
         duration:{type: Number ,required: true},
-        ratings:[],
+        ratings:{type: Number ,default: 0},
         total_rating:{type: Number}
     });
 
