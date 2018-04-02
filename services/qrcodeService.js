@@ -9,6 +9,7 @@ var service = {};
 service.createStringQRCode= createStringQRCode;
 service.createImage = createImage;
 service.deleteImage = deleteImage;
+service.getImage = getImage;
 module.exports = service;
 
 function createStringQRCode(linkedin){
@@ -60,4 +61,16 @@ function deleteImage(filename){
       console.log(filename + ' was deleted');
       return true
     });
+};
+
+//get a QR image
+function getImage(filename, cb){
+    console.log("filename: " + filename);
+    var img = fs.readFileSync(consts.QRCODELIB + filename);
+    if (!img){
+      console.log("filename not exist");
+      return null
+    }
+     return cb(img);
+
 };

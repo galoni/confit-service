@@ -11,6 +11,7 @@ var conferenceSchema = new mongoose.Schema({
         lectures:[],
         exhibits:[],
         program:[],
-        overall_rating: { type: Number }
+        overall_rating: { type: Number },
+        qr_code: {type: String}
     });
 module.exports = mongoose.model(`conference`, conferenceSchema);

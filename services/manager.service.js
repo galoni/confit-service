@@ -1,9 +1,10 @@
 const mongoose  = require('mongoose'),
       ObjectId  = require('mongodb').ObjectID;
-const Manager     = require('../models/managerSchema');
-const confSession = require('../models/sessionSchema');
-const lecture     = require('../models/lectureSchema');
-const Conf        = require('../models/conferenceSchema');
+var Manager     = require('../models/managerSchema');
+var confSession = require('../models/sessionSchema');
+var lecture     = require('../models/lectureSchema');
+var Conf        = require('../models/conferenceSchema');
+var qrcodeApi   = require('./qrcodeService')
 // var ts         = require('../services/track.service');
 const consts      = require('../consts.js');
 
@@ -69,6 +70,11 @@ function createConference(name, type, logo, start_date, end_date, location, audi
             return resolve(false);
         }
         else{
+          var qr_code = qrcodeApi.createImage(name, 'conference')
+          if (!qr_code){
+              console.log("failed to create qr_code");
+              reject("failed to create qr_code");
+          }
           console.log('Trace: createConference('+name+','+type+')');
             let newConfernce = new Conf({
             name : name,
@@ -77,7 +83,8 @@ function createConference(name, type, logo, start_date, end_date, location, audi
             start_date : start_date,
             end_date : end_date,
             audience : audience,
-            location : location
+            location : location,
+            qr_code : qr_code
           });
           console.log('createConference STATUS: SUCCESS ' + name);
           newConfernce.save((err, cnf) => {
@@ -165,7 +172,7 @@ function removeSession(confId, sessionName) {
             }
             else {
               console.log(`Saved document: ${cnf.name}`);
-            }   
+            }
           });
           resolve(true);
           return;
@@ -237,7 +244,7 @@ function addLectureToConf(lectureId, confId) {
             console.log(`Saved document: ${conf.name}`);
             resolve(conf.lectures);
           }
-        });  
+        });
       })
     });
   });
@@ -340,7 +347,7 @@ function create(username, password){
             reject({"error": err});
             console.log('REGISTER STATUS: FAILED');
           }
-          
+
           if(user) {
             console.log("info : exist username");
             return resolve({"info": " exist username"});
@@ -408,7 +415,7 @@ function login(username, password){
             reject({"error": err});
             console.log('LOGIN STATUS: FAILED');
           }
-          
+
           if(!user) {
             console.log("info : wrong username");
             return resolve({"info": " wrong username"});
@@ -490,7 +497,7 @@ function addTrackToPlaylist(trackId, userId, playlistName) {
               else
                 console.log(`Saved document: ${user.username}`);
             });
-          }); 
+          });
         }
       });
     resolve(true);
@@ -518,9 +525,9 @@ function removeTrackFromPlaylist(trackId, userId, playlistName) {
                   console.log(`Saved document: ${user.username}`);
                   resolve(true);
                   return;
-                }   
+                }
               });
-            }  
+            }
           }
         }
       }
@@ -546,7 +553,7 @@ function removePlaylist(userId, playlistName) {
             else {
               console.log(`Saved document: ${user.username}`);
               return resolve(true);
-            }   
+            }
           });
         }
       }

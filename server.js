@@ -23,8 +23,7 @@ app.use(
 });
 
 app.get('/', (req,res) => {
-  console.log('Trace: API Page');
-  res.sendFile(__dirname + '/api/index.html');
+  console.log('Trace: default Address');
 });
 
 /*** All routes ***/

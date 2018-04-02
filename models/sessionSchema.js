@@ -23,4 +23,3 @@ module.exports = mongoose.model('session', confSession);
 // exports.confSession = mongoose.model(`session`, sessionSchema);
 
 // exports.sessionSchema=sessionSchema;
-

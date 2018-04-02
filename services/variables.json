@@ -1,0 +1,59 @@
+{
+  "conf": {
+      "sessions": ["lkjsdghflfklgh"],
+      "lectures": [{
+        "_id": {
+            "$oid": "5a85ff59734d1d1523dcef85"
+        },
+        "name": "minimize cloud costs",
+        "lecturer_name": "Dr. Benjamin Static",
+        "visitor_id": [
+            "kljwehfr3",
+            "jdhfgj4"
+        ],
+        "description": "Managing cloud operations is expensive, but there are ways to lower the costs. Best practices in cloud management starts with the mindset of optimizing your resources. A well oiled machine runs better than an inefficient, high powered engine. There is an immediate benefit to reducing the amount of hardware on-site, which lowers ongoing maintenance costs.",
+        "topic": {
+            "_id": "lkdjhg4",
+            "name": "web infrastructure"
+        },
+        "duration": "1.5",
+        "ratings": [
+            {
+                "visitor_id": "sdr347we",
+                "lecture_rating": 3,
+                "lecturer_reating": 5,
+                "overall_rating": 5
+            }
+        ],
+        "total_rating": 4.4,
+        "session": {
+          "conf": "skdljfhglsd",
+          "session": "lkjsdghflfklgh"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "5ab3e093321fd333e809dab1"
+        },
+        "name": "pb lecture",
+        "lecturer_name": "rate",
+        "description": "test the rating",
+        "duration": 22,
+        "ratings": 0,
+        "visitor_id": [],
+        "topic": [],
+        "__v": 0,
+        "session": {
+          "conf": "skdljfhglsd",
+          "session": "lkjsdghflfklgh"
+        }
+    }
+]
+  },
+  "visitor": {
+      "preffered_lectures": ["5ab3e093321fd333e809dab1"],
+      "connection_percent": 0.2,
+      "explore_percent": 0.3,
+      "learn_percent": 0.5
+  }
+}

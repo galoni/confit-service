@@ -147,7 +147,7 @@ function registerToConf
     preffered_lectures.push(lecture1);
     preffered_lectures.push(lecture2);
     preffered_lectures.push(lecture3);
-    
+
     return new Promise((resolve, reject) => {
           var conditions = ({_id: ObjectId(visitorid)},{confs.confId: confid}),
           update = {
@@ -194,7 +194,7 @@ function registerToConf
             console.log(`Saved document`);
             resolve("true");
           }
-        });  
+        });
     });
   });
 }
