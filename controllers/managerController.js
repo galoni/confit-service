@@ -18,6 +18,7 @@ router.post('/createConference', createConference);
 router.post('/removeSession', removeSession);
 router.post('/removeLecture', removeLecture);
 router.post('/buildProgram', buildProgram);
+router.post('/getAllLectures', getAllLectures);
 // router.post('/login', login);
 // router.post('/register', register);
 // router.get('/logout', logout);
@@ -56,7 +57,7 @@ function createConference(req, res) {
   let audience      = req.body.audience;
   managerService.createConference(name, type, logo, start_date, end_date, location, audience)
       .then(function(status) {
-          res.status(200).json({"status": status});
+          res.status(200).json(status);
       })
       .catch(function (err) {
           res.status(400).send(err);
@@ -71,7 +72,7 @@ function createLecture(req, res) {
   let ratings       = req.body.ratings;
   managerService.createLecture(name, lecturer_name, description, duration, ratings)
       .then(function(status) {
-          res.status(200).json({"status": status});
+          res.status(200).json(status);
       })
       .catch(function (err) {
           res.status(400).send(err);
@@ -169,6 +170,22 @@ function buildProgram(req, res) {
             res.status(200).json({"status": status});
         })
         .catch(function (err) {
+            res.status(400).send(err);
+        });
+}
+
+function getAllLectures(req, res){
+    managerService.getAllLectures()
+        .then(function (lectures) {
+            if (lectures) {
+                console.log("lectures:" + lectures);
+                res.send(lectures);
+            } else {
+                res.sendStatus(404);
+            }
+        })
+        .catch(function (err) {
+            console.log("error:" + err);
             res.status(400).send(err);
         });
 }

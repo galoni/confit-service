@@ -19,6 +19,7 @@ service.addLectureToConf        = addLectureToConf;
 service.createConference        = createConference;
 service.removeSession           = removeSession;
 service.removeLecture           = removeLecture;
+service.getAllLectures          = getAllLectures;
 
 module.exports = service;
 
@@ -321,6 +322,25 @@ function addSessionToConf(name, session_type, duration, dayNum, time, confId) {
   });
 }
 
+function getAllLectures(){
+    return new Promise((resolve, reject) => {
+        console.log("getAllLectures ");
+        lecture.find(
+            (err, lct) => {
+                if(err) {
+                    console.log('getAllLectures STATUS: FAILED');
+                    reject(err);
+                }
+                console.log('getAllLectures STATUS: SUCCESS');
+                if(!lct) {
+                    console.log("info : No lectures probably not");
+                    return resolve("info : No lectures probably not");
+                }
+                resolve(lct);
+            });
+    });
+}
+
 function addNewPlaylist(userId, playlistName){
   console.log('Trace: addTrackToPlaylist('+userId+','+playlistName+')');
   return new Promise((resolve, reject) => {
@@ -382,6 +402,7 @@ function create(username, password){
     });
   });
 }
+
 
 function getUserById(userId){
   return new Promise((resolve, reject) => {
