@@ -46,6 +46,7 @@ function createSession(req, res) {
 }
 
 function createConference(req, res) {
+    console.log(req);
   let name          = req.body.name;
   let type          = req.body.type;
   let logo          = req.body.logo;
