@@ -1,50 +1,161 @@
-const mongoose  = require('mongoose'),
-      ObjectId  = require('mongodb').ObjectID;
-var Visitor     = require('../models/visitorSchema');
-var ProfilePie     = require('../models/profile_pieSchema');
-var confSession = require('../models/sessionSchema');
-var lecture     = require('../models/lectureSchema');
-var Conf        = require('../models/conferenceSchema');
-var qrcodeApi   = require('./qrcodeService');
-var consts      = require('../consts.js');
-var variables   = require ('./variables');
-var Path        = require ('./classes/path');
+const mongoose = require('mongoose'),
+  ObjectId = require('mongodb').ObjectID;
+var Manager = require('./manager.service');
+var Visitor = require('./profileBuilder.service');
+var qrcodeApi = require('./qrcodeService');
+var consts = require('../consts.js');
+var variables = require('./variables');
 const util = require('util');
 var service = {};
 
 //service.buildPie= buildPie;
-service.buildPath=buildPath;
+service.buildPath = buildPath;
 
 module.exports = service;
 
-
-
-
-function buildPath(){
-  var path = new Path(variables);
-  path.insertByPref(function (err, result){
-    if (err){
-      console.log("Could not build by preffered lectures:\n" + err);
-      reject(err);
-    }
-    console.log("insertByPref: %j", result);
+function insertByPref(build, program, profile, elc_modes, next) {
+  profile["preffered_lectures"].forEach(function(pref, index1) {
+    build.forEach(function(builda, index2) {
+      builda["sessions"]["lectures"].forEach(function(lecture, index3) {
+        //if the lecture is the preffered lecture, make it unique in the build (suggest this lecture)
+        if (lecture["_id"] == pref) {
+          builda["sessions"]["lectures"] = builda["sessions"]["lectures"].filter(function(lec){
+            return lec["_id"] == pref;
+          })
+          //attach an elc_mode by availability
+          console.log("Found match for preffered lecture: " + pref);
+          if (elc_modes["learn"] > 0){
+            builda["elc_mode"] = 'learn'
+            elc_modes["learn"]--;
+          }
+          else if (elc_modes["connect"] > 0){
+            builda["elc_mode"] = 'connect'
+            elc_modes["connect"]--;
+          }
+          else if (elc_modes["explore"] > 0){
+            builda["elc_mode"] = 'explore'
+            elc_modes["explore"]--;
+          }
+        }
+      });
     });
-  path.insertByTopic(function (err, result){
-    if (err){
-      console.log("Could not build by main topics:\n" + err);
-      reject(err);
-    }
-    console.log("insertByTopic: %j", result);
-    });
-  return new Promise((resolve, reject) => {
-    //console.log(variables);
-    var conf = variables["conf"];
-    var visitor = variables["visitor"];
-
-    resolve (path);
-
   });
+  next(build, elc_modes, null);
 }
+function insertByTopic(build, program, profile, elc_modes, next) {
+  console.log(profile);
+  profile["mainTopic"].forEach(function(maintopic, index1) {
+
+    build.forEach(function(builda, index2) {
+      builda["sessions"]["lectures"].forEach(function(lecture, index3) {
+        if (lecture["topic"])
+        {lecture["topic"].forEach(function(topic, index4) {
+          if (topic == maintopic) {
+            builda["sessions"]["lectures"] = [lecture];
+            console.log("Found match for main topics: " + lecture);
+            if (elc_modes["learn"] > 0){
+              builda["elc_mode"] = 'learn'
+              elc_modes["learn"]--;
+            }
+            else if (elc_modes["connect"] > 0){
+              builda["elc_mode"] = 'connect'
+              elc_modes["connect"]--;
+            }
+            else if (elc_modes["explore"] > 0){
+              builda["elc_mode"] = 'explore'
+              elc_modes["explore"]--;
+            }
+          }
+        });}
+      });
+    });
+  });
+  next(build, elc_modes, null);
+}
+
+function buildPath() {
+  return new Promise((resolve, reject) => {
+    let _visitor = Visitor.getVisitorById('5aac4e3dafc0b334f06e3ed8')
+      .then(function(visitor_id) {
+        let _program = Manager.getConfById('5a85ff12734d1d1523dcef75')
+          .then(function(conf) {
+            if (conf) {
+              var program = conf["program"];
+            } else {
+              reject("no conf found");
+            }
+            if (visitor_id) {
+              var visitor = visitor_id;
+              var profile = visitor["confs"].find(function(element) {
+                return element["confId"] == conf["_id"];
+              });
+              var elc_modes = {
+                learn: profile["learn_percent"] * conf["program"].length,
+                explore: profile["explore_percent"] * conf["program"].length,
+                connect: profile["connection_percent"] * conf["program"].length,
+              }
+              console.log(profile);
+            } else {
+              reject("no visitor found");
+            }
+            var build = []
+            program.forEach(function(element, index) {
+              build.push({
+                sessions: element,
+                elc_mode: undefined
+              })
+
+            });
+            console.log("before buildeing: " + elc_modes);
+            insertByPref(build, program, profile,elc_modes, function(newBuild, newelc_modes, err) {
+              build = newBuild;
+              elc_modes = newelc_modes;
+              console.log("after building by pref: %j", newelc_modes);
+              var sum_modes = elc_modes["learn"] + elc_modes["connect"] + elc_modes["explore"]
+              if (sum_modes > 0)
+                insertByTopic(build, program, profile,elc_modes, function(newBuild, newelc_modes, err) {
+                  console.log("after building by topic: %j", newelc_modes);
+                  elc_modes = newelc_modes;
+                  build = newBuild;
+                  resolve (build);
+              });
+            });
+
+
+
+          })
+          .catch(function(err) {
+            console.log("error:" + err);
+          });
+      })
+      .catch(function(err) {
+        console.log("error:" + err);
+      });
+    
+  })
+};
+
+
+
+// var path = new Path(variables);
+// path.insertByPref(function (err, result){
+//   if (err){
+//     console.log("Could not build by preffered lectures:\n" + err);
+//     reject(err);
+//   }
+//   console.log("insertByPref: %j", result);
+//   });
+// path.insertByTopic(function (err, result){
+//   if (err){
+//     console.log("Could not build by main topics:\n" + err);
+//     reject(err);
+//   }
+//   console.log("insertByTopic: %j", result);
+//   });
+
+
+
+
 
 
 // Path Builder:

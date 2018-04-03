@@ -10,6 +10,7 @@ var service = {};
 //service.buildPie= buildPie;
 service.createVisitor=createVisitor;
 service.registerToConf=registerToConf;
+service.getVisitorById=getVisitorById;
 //service.getConfsVisitor=getConfsVisitor;
 //service.updateProfilePie=updateProfilePie;
 //service.updatePreffered_lectures=updatePreffered_lectures;
@@ -126,6 +127,24 @@ function registerToConf
     });
 }
 
+function getVisitorById(visitorid){
+  return new Promise((resolve, reject) => {
+    console.log("visitor id: " + visitorid);
+    Visitor.findOne({_id: ObjectId(visitorid)},
+        (err, visitor) => {
+          if(err) {
+            console.log('getVisitorById STATUS: FAILED');
+            reject(err);
+          }
+          console.log('getVisitorById STATUS: SUCCESS');
+          if(!visitor) {
+            console.log("info : wrong visitor id");
+            return resolve("error : wrong visitor id");
+          }
+          resolve(visitor);
+        });
+  });
+}
 /*function updateProfilePie(visitorid, connection_percent,explore_percent,learn_percent) {
     var profilePie=connection_percent*0.001
     +explore_percent*0.01+learn_percent*0.1;

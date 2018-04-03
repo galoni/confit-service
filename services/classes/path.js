@@ -1,21 +1,37 @@
-class Path {
-  constructor(variables) {
-    this.variables = variables;
-    this.conf = variables["conf"];
-    this.visitor = variables["visitor"];
-    this.program = this.conf["sessions"];
-    this.build = {
-      "lecture": Array.apply(null, Array(this.conf["sessions"].length)).map(function() {
-        return 0
-      }),
-      "elc_mode": Array.apply(null, Array(this.conf["sessions"].length)).map(function() {
-        return 0
-      })
-    }
-    this.learnSess = this.visitor["learn_percent"] * this.conf["sessions"].length;
-    this.connectSess = this.visitor["connection_percent"] * this.conf["sessions"].length;
-    this.ExploreSess = this.visitor["explore_percent"] * this.conf["sessions"].length;
+var Manager     = require ('../manager.service');
+var Visitor     = require ('../profileBuilder.service');
 
+function setConfFromDB(conf_id){
+    Manager.getConfById(conf_id)
+    .then(function (conf) {
+        if (conf) {
+          console.log(conf);
+
+          this.program = conf["program"];
+
+        } else {
+          console.log("empty conf");
+        }
+    })
+    .catch(function (err) {
+        console.log("error:" + err);
+    });
+  }
+
+function setVisitorFromDB(visitor_id){
+    Visitor.getVisitorById(visitor_id)
+    .then(function (visitor) {
+        if (visitor) {
+          console.log(visitor);
+          this.visitor = visitor;
+
+        } else {
+          console.log("empty visitor");
+        }
+    })
+    .catch(function (err) {
+        console.log("error:" + err);
+    });
   }
 
   //removing parallel sessions that was added to the path to avoid redundant calculations
@@ -35,7 +51,7 @@ class Path {
     var lecturesLength = this.conf["lectures"].length;
     var prefferedLength = this.visitor["preffered_lectures"].length;
     console.log("Starting to build by the visitor's preffered Lectures");
-    if (this.visitor["preffered_lectures"] === undefined || this.visitor["preffered_lectures"].length == 0) {
+    if (this.visitor["preffered_lectures"] == undefined || this.visitor["preffered_lectures"].length == 0) {
       console.log("Visitor has no preffered lectures");
       next(null, build);
     }
@@ -87,7 +103,7 @@ class Path {
     var lecturesLength = this.conf["lectures"].length;
     var mainTopicLength = this.visitor["mainTopic"].length;
     console.log("Starting to build by the visitor's main topics: ");
-    if (this.visitor["mainTopic"] === undefined || mainTopicLength == 0) {
+    if (this.visitor["mainTopic"] == undefined || mainTopicLength == 0) {
       console.log("Visitor has no main topics");
       next(null, build);
     }
