@@ -19,6 +19,7 @@ router.post('/removeSession', removeSession);
 router.post('/removeLecture', removeLecture);
 router.post('/buildProgram', buildProgram);
 router.post('/getAllLectures', getAllLectures);
+router.post('/addManyLectures', addManyLectures);
 // router.post('/login', login);
 // router.post('/register', register);
 // router.get('/logout', logout);
@@ -186,6 +187,18 @@ function getAllLectures(req, res){
         })
         .catch(function (err) {
             console.log("error:" + err);
+            res.status(400).send(err);
+        });
+}
+
+function addManyLectures(req, res){
+    let confLectures   = req.body.confLectures;
+    let confId     = req.body.confId;
+    managerService.addManyLectures(confLectures, confId)
+        .then(function(status) {
+            res.status(200).json(status);
+        })
+        .catch(function (err) {
             res.status(400).send(err);
         });
 }

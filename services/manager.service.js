@@ -20,6 +20,7 @@ service.createConference        = createConference;
 service.removeSession           = removeSession;
 service.removeLecture           = removeLecture;
 service.getAllLectures          = getAllLectures;
+service.addManyLectures         = addManyLectures;
 
 module.exports = service;
 
@@ -337,6 +338,25 @@ function getAllLectures(){
                     return resolve("info : No lectures probably not");
                 }
                 resolve(lct);
+            });
+    });
+}
+
+function addManyLectures(confLectures, confId){
+    console.log('Trace: addManyLectures('+confLectures+','+confId+')');
+    return new Promise((resolve, reject) => {
+        let conditions = {_id: ObjectId(confId)},
+            update = {"lectures" : confLectures},
+            opts = {new:true};
+        Conf.update(conditions, update, opts,
+            (err, obj) => {
+                if(err) {
+                    reject({"error": err});
+                    console.log('addManyLectures STATUS: FAILED' + err);
+                } else{
+                    console.log(`addManyLectures STATUS: SUCCESS`);
+                    resolve(obj);
+                }
             });
     });
 }
