@@ -2,16 +2,27 @@ const mongoose = require('mongoose'),
   ObjectId = require('mongodb').ObjectID;
 var Manager = require('./manager.service');
 var Visitor = require('./profileBuilder.service');
-var qrcodeApi = require('./qrcodeService');
-var consts = require('../consts.js');
-var variables = require('./variables');
-const util = require('util');
+var VisitorScehma = require('../models/visitorSchema');
 var service = {};
 
-//service.buildPie= buildPie;
 service.buildPath = buildPath;
 
 module.exports = service;
+
+function addToVisitorSchema(build, visitorId, cb) {
+  var doc = {
+    custome_path: build
+  }
+  VisitorScehma.update({_id: visitorId}, doc, function(err, raw) {
+    if (err){
+      console.log(err);
+       cb("Could not add Path to visitor " + visitorId);
+    }
+    else{
+      console.log("Added custome path to "+ visitorId);
+    }
+  })
+}
 
 function insertByPref(build, program, profile, elc_modes, next) {
   profile["preffered_lectures"].forEach(function(pref, index1) {
@@ -19,20 +30,18 @@ function insertByPref(build, program, profile, elc_modes, next) {
       builda["sessions"]["lectures"].forEach(function(lecture, index3) {
         //if the lecture is the preffered lecture, make it unique in the build (suggest this lecture)
         if (lecture["_id"] == pref) {
-          builda["sessions"]["lectures"] = builda["sessions"]["lectures"].filter(function(lec){
+          builda["sessions"]["lectures"] = builda["sessions"]["lectures"].filter(function(lec) {
             return lec["_id"] == pref;
           })
           //attach an elc_mode by availability
           console.log("Found match for preffered lecture: " + pref);
-          if (elc_modes["learn"] > 0){
+          if (elc_modes["learn"] > 0) {
             builda["elc_mode"] = 'learn'
             elc_modes["learn"]--;
-          }
-          else if (elc_modes["connect"] > 0){
+          } else if (elc_modes["connect"] > 0) {
             builda["elc_mode"] = 'connect'
             elc_modes["connect"]--;
-          }
-          else if (elc_modes["explore"] > 0){
+          } else if (elc_modes["explore"] > 0) {
             builda["elc_mode"] = 'explore'
             elc_modes["explore"]--;
           }
@@ -42,42 +51,65 @@ function insertByPref(build, program, profile, elc_modes, next) {
   });
   next(build, elc_modes, null);
 }
-function insertByTopic(build, program, profile, elc_modes, next) {
-  console.log(profile);
-  profile["mainTopic"].forEach(function(maintopic, index1) {
 
+function insertByTopic(build, program, profile, elc_modes, next) {
+  profile["mainTopic"].forEach(function(maintopic, index1) {
     build.forEach(function(builda, index2) {
       builda["sessions"]["lectures"].forEach(function(lecture, index3) {
-        if (lecture["topic"])
-        {lecture["topic"].forEach(function(topic, index4) {
-          if (topic == maintopic) {
-            builda["sessions"]["lectures"] = [lecture];
-            console.log("Found match for main topics: " + lecture);
-            if (elc_modes["learn"] > 0){
-              builda["elc_mode"] = 'learn'
-              elc_modes["learn"]--;
+        if (lecture["topic"]) {
+          lecture["topic"].forEach(function(topic, index4) {
+            if (topic == maintopic) {
+              builda["sessions"]["lectures"] = [lecture];
+              console.log("Found match for main topics: " + lecture["_id"]);
+              if (builda["elc_mode"] == undefined){
+                if (elc_modes["learn"] > 0) {
+                  builda["elc_mode"] = 'learn'
+                  elc_modes["learn"]--;
+                } else if (elc_modes["connect"] > 0) {
+                  builda["elc_mode"] = 'connect'
+                  elc_modes["connect"]--;
+                } else if (elc_modes["explore"] > 0) {
+                  builda["elc_mode"] = 'explore'
+                  elc_modes["explore"]--;
+                }
+              }
             }
-            else if (elc_modes["connect"] > 0){
-              builda["elc_mode"] = 'connect'
-              elc_modes["connect"]--;
-            }
-            else if (elc_modes["explore"] > 0){
-              builda["elc_mode"] = 'explore'
-              elc_modes["explore"]--;
-            }
-          }
-        });}
+          });
+        }
       });
     });
   });
   next(build, elc_modes, null);
 }
 
-function buildPath() {
+function insertRest(build, program, profile, elc_modes, next) {
+  build.forEach(function(abuild) {
+    let lectures = abuild["sessions"]["lectures"]
+    // console.log("\n\n\n\n" + lectures);
+    if (lectures.length > 1) {
+      abuild["sessions"]["lectures"] = [lectures[Math.floor(Math.random() * lectures.length)]];
+      console.log("added left lecture: " + abuild["sessions"]["lectures"][0]["_id"]);
+      if (elc_modes["learn"] > 0) {
+        abuild["elc_mode"] = 'learn'
+        elc_modes["learn"]--;
+      } else if (elc_modes["connect"] > 0) {
+        abuild["elc_mode"] = 'connect'
+        elc_modes["connect"]--;
+      } else if (elc_modes["explore"] > 0) {
+        abuild["elc_mode"] = 'explore'
+        elc_modes["explore"]--;
+      }
+    }
+  });
+  next(build, elc_modes, null);
+}
+
+function buildPath(confId,visitorId) {
   return new Promise((resolve, reject) => {
-    let _visitor = Visitor.getVisitorById('5aac4e3dafc0b334f06e3ed8')
+    console.log("------Building Path------");
+    let _visitor = Visitor.getVisitorById(visitorId)
       .then(function(visitor_id) {
-        let _program = Manager.getConfById('5a85ff12734d1d1523dcef75')
+        let _program = Manager.getConfById(confId)
           .then(function(conf) {
             if (conf) {
               var program = conf["program"];
@@ -107,18 +139,40 @@ function buildPath() {
 
             });
             console.log("before buildeing: " + elc_modes);
-            insertByPref(build, program, profile,elc_modes, function(newBuild, newelc_modes, err) {
+            insertByPref(build, program, profile, elc_modes, function(newBuild, newelc_modes, err) {
               build = newBuild;
               elc_modes = newelc_modes;
               console.log("after building by pref: %j", newelc_modes);
               var sum_modes = elc_modes["learn"] + elc_modes["connect"] + elc_modes["explore"]
               if (sum_modes > 0)
-                insertByTopic(build, program, profile,elc_modes, function(newBuild, newelc_modes, err) {
+                insertByTopic(build, program, profile, elc_modes, function(newBuild, newelc_modes, err) {
                   console.log("after building by topic: %j", newelc_modes);
                   elc_modes = newelc_modes;
                   build = newBuild;
-                  resolve (build);
-              });
+                  sum_modes = elc_modes["learn"] + elc_modes["connect"] + elc_modes["explore"]
+                  if (sum_modes > 0)
+                    insertRest(build, program, profile, elc_modes, function(newBuild, newelc_modes, err) {
+                      elc_modes = newelc_modes;
+                      console.log("after building by rest: %j", newelc_modes);
+                      build = newBuild;
+                      addToVisitorSchema(build, visitorId, function(err){
+                        if (err) reject(err);
+                      });
+                      resolve(build);
+                    });
+                  else {
+                    addToVisitorSchema(build, visitorId, function(err){
+                      if (err) reject(err);
+                    });
+                    resolve(build);
+                  }
+                });
+              else {
+                addToVisitorSchema(build, visitorId, function(err){
+                  if (err) reject(err);
+                });
+                resolve(build);
+              }
             });
 
 
@@ -131,7 +185,7 @@ function buildPath() {
       .catch(function(err) {
         console.log("error:" + err);
       });
-    
+
   })
 };
 
