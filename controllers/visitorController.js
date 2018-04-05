@@ -78,9 +78,10 @@ function updatePreffered_lectures(req, res) {
           res.status(400).send(err);
       });
 }
-
+//'5aac4e3dafc0b334f06e3ed8' - visitorId
+//'5a85ff12734d1d1523dcef75' - confId
 function buildPath(req, res) {
-  pathBuilderService.buildPath()
+  pathBuilderService.buildPath(req.body.confId,req.body.visitorId)
       .then(function(status) {
           res.status(200).json({"status": status});
       })

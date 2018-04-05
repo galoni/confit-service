@@ -11,6 +11,7 @@ var conferenceSchema = new mongoose.Schema({
         lectures:[],
         exhibits:[],
         program:[],
+        visitors: [],
         overall_rating: { type: Number },
         qr_code: {type: String}
     });
