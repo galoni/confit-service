@@ -59,7 +59,7 @@ module.exports = service;
 //   });
 // }
 
-function createConference(name, type, logo, start_date, end_date, location, audience){
+function createConference(name, type, logo, start_date, duration, location, audience){
   return new Promise((resolve, reject) => {
     Conf.findOne({name : name},
       (err, cnf) => {
@@ -78,7 +78,7 @@ function createConference(name, type, logo, start_date, end_date, location, audi
             type : type,
             logo : logo,
             start_date : start_date,
-            end_date : end_date,
+            duration : duration,
             audience : audience,
             location : location,
             qr_code : ''

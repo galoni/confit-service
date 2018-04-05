@@ -5,12 +5,13 @@ var conferenceSchema = new mongoose.Schema({
         logo: {type: String,required: true},
         audience:{type: String,required: true},
         start_date: {type: String,required: true},
-        end_date:{type: String,required: true},
+        duration:{type: Number,required: true},
         main_topics:[],
         location:{type: String,required: true},
         lectures:[],
         exhibits:[],
         program:[],
+        visitors:[],
         overall_rating: { type: Number },
         qr_code: {type: String}
     });

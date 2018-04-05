@@ -53,10 +53,10 @@ function createConference(req, res) {
   let type          = req.body.type;
   let logo          = req.body.logo;
   let start_date    = req.body.start_date;
-  let end_date      = req.body.end_date;
+  let duration      = req.body.duration;
   let location      = req.body.location;
   let audience      = req.body.audience;
-  managerService.createConference(name, type, logo, start_date, end_date, location, audience)
+  managerService.createConference(name, type, logo, start_date, duration, location, audience)
       .then(function(status) {
           res.status(200).json(status);
       })
