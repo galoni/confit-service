@@ -42,7 +42,7 @@ function createImage(id, data, type){
     var qr = QRCode.toFile(consts.QRCODELIB + filename, JSON.stringify(qrjson), {
       color: {
         dark: '#02729a',  // Blue dots
-        light: '#0000' // Transparent background
+        light: '#FFFF' // Transparent background
       }
     }, function (err) {
       if (err) throw err

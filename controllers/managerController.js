@@ -21,6 +21,8 @@ router.post('/buildProgram', buildProgram);
 router.post('/getAllLectures', getAllLectures);
 router.post('/addManyLectures', addManyLectures);
 router.post('/createProgram', createProgram);
+router.post('/getAllConfs', getAllConfs);
+
 // router.post('/login', login);
 // router.post('/register', register);
 // router.get('/logout', logout);
@@ -182,6 +184,22 @@ function getAllLectures(req, res){
             if (lectures) {
                 console.log("lectures:" + lectures);
                 res.send(lectures);
+            } else {
+                res.sendStatus(404);
+            }
+        })
+        .catch(function (err) {
+            console.log("error:" + err);
+            res.status(400).send(err);
+        });
+}
+
+function getAllConfs(req, res){
+    managerService.getAllConfs()
+        .then(function (confs) {
+            if (confs) {
+                console.log("confs:" + confs);
+                res.send(confs);
             } else {
                 res.sendStatus(404);
             }

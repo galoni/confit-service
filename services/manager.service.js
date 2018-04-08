@@ -22,8 +22,26 @@ service.removeLecture           = removeLecture;
 service.getAllLectures          = getAllLectures;
 service.addManyLectures         = addManyLectures;
 service.createProgram           = createProgram;
+service.getAllConfs             = getAllConfs;
+service.addVisitorTocConf       = addVisitorTocConf;
 
 module.exports = service;
+
+function addVisitorTocConf(visitorid, confid){
+  console.log('Trace: addVisitorTocConf('+visitorid+','+confid+')');
+    Conf.findByIdAndUpdate(confid,
+    {$push: {visitors: visitorid}},
+    {safe: true, upsert: true},
+    function(err, doc) {
+        if(err){
+        console.log(err);
+        }else{
+        console.log("success "+confid+" updated");
+        }
+    }
+);
+}
+
 
 // function createSession(name, session_type, duration){
 //   return new Promise((resolve, reject) => {
@@ -342,6 +360,26 @@ function getAllLectures(){
             });
     });
 }
+
+function getAllConfs(){
+    return new Promise((resolve, reject) => {
+        console.log("getAllConfs ");
+        Conf.find(
+            (err, confs) => {
+                if(err) {
+                    console.log('getAllConfs STATUS: FAILED');
+                    reject(err);
+                }
+                console.log('getAllConfs STATUS: SUCCESS');
+                if(!confs) {
+                    console.log("info : No confs probably not");
+                    return resolve("info : No confs probably not");
+                }
+                resolve(confs);
+            });
+    });
+}
+
 
 function addManyLectures(confLectures, confId){
     console.log('Trace: addManyLectures('+confLectures+','+confId+')');
