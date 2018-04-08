@@ -169,6 +169,22 @@ function createLecture(name, lecturer_name, description, duration, ratings, topi
               reject("error");
             }
             else{
+              var qr_code = qrcodeApi.createImage(lct["_id"],lct["name"], 'lecture')
+              if (!qr_code){
+                  console.log("failed to create qr_code");
+                  reject("failed to create qr_code");
+              }
+              doc = {
+                qr_code: qr_code
+              }
+              newLecture.update({_id: lct["_id"]}, doc, function(err, raw) {
+                if (err){
+                  reject ("could not update qr_code")
+                }
+                else{
+                  console.log("Added qr_code to "+ lct["_id"]);
+                }
+              })
               console.log("new lcture: " + lct);
               resolve(lct);
             }

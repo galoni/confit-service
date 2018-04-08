@@ -9,11 +9,18 @@ service.buildPath = buildPath;
 
 module.exports = service;
 
-function addToVisitorSchema(build, visitorId, cb) {
-  var doc = {
-    custome_path: build
+function addToVisitorSchema(build, visitorId,confId, cb) {
+  var doc = 
+    { "$push":
+        {"confs.$.custome_path":
+            build
+        }
   }
-  VisitorScehma.update({_id: visitorId}, doc, function(err, raw) {
+  let query = {
+    "_id": visitorId,
+    "confs.confId":confId
+  }
+  VisitorScehma.update(query, doc, function(err, raw) {
     if (err){
       console.log(err);
        cb("Could not add Path to visitor " + visitorId);
@@ -155,20 +162,20 @@ function buildPath(confId,visitorId) {
                       elc_modes = newelc_modes;
                       console.log("after building by rest: %j", newelc_modes);
                       build = newBuild;
-                      addToVisitorSchema(build, visitorId, function(err){
+                      addToVisitorSchema(build, visitorId, confId, function(err){
                         if (err) reject(err);
                       });
                       resolve(build);
                     });
                   else {
-                    addToVisitorSchema(build, visitorId, function(err){
+                    addToVisitorSchema(build, visitorId, confId, function(err){
                       if (err) reject(err);
                     });
                     resolve(build);
                   }
                 });
               else {
-                addToVisitorSchema(build, visitorId, function(err){
+                addToVisitorSchema(build, visitorId, confId, function(err){
                   if (err) reject(err);
                 });
                 resolve(build);
