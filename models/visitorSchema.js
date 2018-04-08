@@ -9,7 +9,6 @@ let mongoose = require (`mongoose`),
         occupation:{type: String,required: true},
 
         current_mode:{type: String},
-        custome_path:[],
         confs: [],
         qr_code: {type: String}
     });
