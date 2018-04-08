@@ -20,6 +20,7 @@ router.post('/removeLecture', removeLecture);
 router.post('/buildProgram', buildProgram);
 router.post('/getAllLectures', getAllLectures);
 router.post('/addManyLectures', addManyLectures);
+router.post('/createProgram', createProgram);
 router.post('/getAllConfs', getAllConfs);
 
 // router.post('/login', login);
@@ -213,6 +214,18 @@ function addManyLectures(req, res){
     let confLectures   = req.body.confLectures;
     let confId     = req.body.confId;
     managerService.addManyLectures(confLectures, confId)
+        .then(function(status) {
+            res.status(200).json(status);
+        })
+        .catch(function (err) {
+            res.status(400).send(err);
+        });
+}
+
+function createProgram(req, res){
+    let confSessions   = req.body.confSessions;
+    let confId     = req.body.confId;
+    managerService.createProgram(confSessions, confId)
         .then(function(status) {
             res.status(200).json(status);
         })

@@ -21,6 +21,7 @@ service.removeSession           = removeSession;
 service.removeLecture           = removeLecture;
 service.getAllLectures          = getAllLectures;
 service.addManyLectures         = addManyLectures;
+service.createProgram           = createProgram;
 service.getAllConfs             = getAllConfs;
 service.addVisitorTocConf       = addVisitorTocConf;
 
@@ -409,6 +410,25 @@ function addManyLectures(confLectures, confId){
                     console.log('addManyLectures STATUS: FAILED' + err);
                 } else{
                     console.log(`addManyLectures STATUS: SUCCESS`);
+                    resolve(obj);
+                }
+            });
+    });
+}
+
+function createProgram(confSessions, confId){
+    console.log('Trace: createProgram('+confSessions+','+confId+')');
+    return new Promise((resolve, reject) => {
+        let conditions = {_id: ObjectId(confId)},
+            update = {"program" : confSessions},
+            opts = {new:true};
+        Conf.update(conditions, update, opts,
+            (err, obj) => {
+                if(err) {
+                    reject({"error": err});
+                    console.log('createProgram STATUS: FAILED' + err);
+                } else{
+                    console.log(`createProgram STATUS: SUCCESS`);
                     resolve(obj);
                 }
             });

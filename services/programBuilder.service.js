@@ -17,9 +17,11 @@ function buildProgram(confId) {
       let sortLectures = conf.lectures.sort(function(a, b) {
         return b.ratings - a.ratings
       });
+        console.log('Trace: sortLectures ' + JSON.stringify(sortLectures));
       let lIndex = 0;
       while (lIndex < sortLectures.length) {
         for (let sIndex = 0; sIndex < sortProgram.length; sIndex++) {
+            console.log('Trace: sortProgram ' + JSON.stringify(sortProgram[sIndex]));
           if (sortLectures[lIndex] != null) {
             sortProgram[sIndex].lectures.push(sortLectures[lIndex]);
           }
