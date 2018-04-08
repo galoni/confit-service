@@ -74,7 +74,9 @@ function createLecture(req, res) {
   let duration      = req.body.duration;
   let description   = req.body.description;
   let ratings       = req.body.ratings;
-  managerService.createLecture(name, lecturer_name, description, duration, ratings)
+  let topics        = req.body.topics;
+  console.log("data: " +topics);
+  managerService.createLecture(name, lecturer_name, description, duration, ratings, topics)
       .then(function(status) {
           res.status(200).json(status);
       })
@@ -171,7 +173,7 @@ function buildProgram(req, res) {
     let confId     = req.body.confId;
     programBuilderService.buildProgram(confId)
         .then(function(status) {
-            res.status(200).json({"status": status});
+            res.status(200).json(status);
         })
         .catch(function (err) {
             res.status(400).send(err);
