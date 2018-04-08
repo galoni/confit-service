@@ -22,7 +22,7 @@ function create_string_qrcode(req, res) {
 
 //create a QR Code image and returns filename
 function create_image_qrcode(req, res) {
-  qrcodeService.createImage(req.body.linkedin, req.body.type)
+  qrcodeService.createImage(req.body.id, req.body.data, req.body.type)
       .then(function(status) {
           res.status(200).json({"status": status});
       })
