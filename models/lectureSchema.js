@@ -7,7 +7,8 @@ let mongoose = require (`mongoose`),
         topic: [],
         duration:{type: Number ,required: true},
         ratings:{type: Number ,default: 0},
-        total_rating:{type: Number}
+        total_rating:{type: Number},
+        qr_code: {type: String}
     });
 
 module.exports = mongoose.model(`lecture`, lectureSchema);

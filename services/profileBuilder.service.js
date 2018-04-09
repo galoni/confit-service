@@ -16,6 +16,8 @@ service.getVisitorById=getVisitorById;
 //service.getConfsVisitor=getConfsVisitor;
 service.updateProfilePie=updateProfilePie;
 service.updatePreffered_lectures=updatePreffered_lectures;
+service.setTopics=setTopics;
+
 //service.matching=matching;
 
 //service.getPie=getPie;
@@ -189,6 +191,8 @@ function updateProfilePie(visitorid, connection_percent,explore_percent,learn_pe
     });
 }
 
+
+
 function updatePreffered_lectures
 (visitorid,confid, lecture1,lecture2,lecture3) {
   console.log("Trace: updatePreffered_lectures("+visitorid+") To conference id ("+confid+")");
@@ -251,7 +255,35 @@ function updatePreffered_lectures
   });*/
 }
 
-
+function setTopics
+(visitorid,confid, topic1,topic2,topic3) {
+  console.log("Trace: setTopics("+visitorid+") To conference id ("+confid+")");
+    var mainTopic=[];
+    mainTopic.push(topic1);
+    mainTopic.push(topic2);
+    mainTopic.push(topic3);
+    return new Promise((resolve, reject) => {
+    Visitor.update(
+    {
+        "_id" :visitorid, 
+        "confs.confId": confid
+    }, 
+    {
+        "$push": { 
+            "confs.$.mainTopic": mainTopic
+        }
+    },
+    function(err, doc) {
+        if(err){
+        console.log(err);
+            reject({"error": err});
+        }else{
+        console.log("success "+visitorid+" updated");
+            resolve(true);
+        }
+    });
+    });
+}
 /*function updatePreffered_lectures
 (visitorid,confid, lecture1,lecture2,lecture3) {
   console.log("Trace: updatePreffered_lectures("+visitorid+") To conference id ("+confid+")");

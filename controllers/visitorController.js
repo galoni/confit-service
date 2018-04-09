@@ -14,6 +14,7 @@ router.post('/updatePreffered_lectures', updatePreffered_lectures);
 router.post('/getConfsVisitor', getConfsVisitor);
 router.post('/buildPath', buildPath);
 router.post('/getVisitorById', getVisitorById);
+router.post('/setTopics', setTopics);
 module.exports = router;
 
 function getVisitorById(req, res){
@@ -71,6 +72,17 @@ function registerToConf(req, res) {
 
 function updateProfilePie(req, res) {
   visitorService.updateProfilePie(req.body.visitorid, req.body.connection_percent,req.body.explore_percent,req.body.learn_percent)
+      .then(function(status) {
+          res.status(200).json({"status": status});
+      })
+      .catch(function (err) {
+          res.status(400).send(err);
+      });
+}
+
+
+function setTopics(req, res) {
+  visitorService.setTopics(req.body.visitorid, req.body.confid,req.body.topic1,req.body.topic2,req.body.topic3)
       .then(function(status) {
           res.status(200).json({"status": status});
       })
