@@ -19,9 +19,12 @@ function buildProgram(confId) {
       });
         console.log('Trace: sortLectures ' + JSON.stringify(sortLectures));
       let lIndex = 0;
+      for (let sIndex = 0; sIndex < sortProgram.length; sIndex++){ //clear the lectures array
+        sortProgram[sIndex].lectures = [];
+      }
       while (lIndex < sortLectures.length) {
         for (let sIndex = 0; sIndex < sortProgram.length; sIndex++) {
-            console.log('Trace: sortProgram ' + JSON.stringify(sortProgram[sIndex]));
+            // console.log('Trace: sortProgram ' + JSON.stringify(sortProgram[sIndex]));
           if (sortLectures[lIndex] != null) {
             sortProgram[sIndex].lectures.push(sortLectures[lIndex]);
           }
@@ -39,17 +42,23 @@ function buildProgram(confId) {
                 conf.visitors.forEach(function(visitorId) {
                   pathBuilder.buildPath(confId, visitorId);
                 });
-                resolve(cngObj);
+                sortProgram.sort(function(a, b) {
+                    return a.dayNum - b.dayNum
+                });
+                resolve(sortProgram);
               }
             });
           }
         }
       }
-      console.log(`sorted program: ${JSON.stringify(sortProgram)}`);
+      console.log(`sorted finish: ${JSON.stringify(sortProgram)}`);
       conf.visitors.forEach(function(visitorId) {
         pathBuilder.buildPath(confId, visitorId);
       });
-      resolve(`sorted program: ${JSON.stringify(sortProgram)}`);
+      sortProgram.sort(function(a, b) {
+          return a.dayNum - b.dayNum
+      });
+      resolve(sortProgram);
     });
   });
 }
