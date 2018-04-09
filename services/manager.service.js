@@ -134,7 +134,7 @@ function createConference(name, type, logo, start_date, duration, location, audi
   });
 }
 
-function createLecture(name, lecturer_name, description, duration){
+function createLecture(name, lecturer_name, description, duration, ratings, topics){
   return new Promise((resolve, reject) => {
     lecture.findOne({name : name},
       (err, lct) => {
@@ -147,12 +147,14 @@ function createLecture(name, lecturer_name, description, duration){
             return resolve("error : exist NAME");
         }
         else{
-          console.log('Trace: createLecture('+name+','+lecturer_name+')');
+          console.log('Trace: createLecture('+name+','+topics+')');
             let newLecture = new lecture({
             name : name,
             lecturer_name : lecturer_name,
             description : description,
             duration : duration,
+            ratings : ratings,
+            topic : topics
           });
           console.log('CREATE LECTURE STATUS: SUCCESS ' + name);
           newLecture.save((err, lct) => {
@@ -397,22 +399,40 @@ function getAllConfs(){
 }
 
 
-function addManyLectures(confLectures, confId){
+function addManyLectures(confLectures, confId, confTopics){
     console.log('Trace: addManyLectures('+confLectures+','+confId+')');
     return new Promise((resolve, reject) => {
-        let conditions = {_id: ObjectId(confId)},
-            update = {"lectures" : confLectures},
-            opts = {new:true};
-        Conf.update(conditions, update, opts,
-            (err, obj) => {
-                if(err) {
-                    reject({"error": err});
-                    console.log('addManyLectures STATUS: FAILED' + err);
-                } else{
-                    console.log(`addManyLectures STATUS: SUCCESS`);
-                    resolve(obj);
+        Conf.update({
+            "_id":confId
+        },{
+            "$set":{
+                "lectures" : confLectures,
+                "main_topics": confTopics
+            }
+        },
+            function(err, conf){
+                if(err){
+                    console.log("err: " + err);
+                    reject(err);
                 }
-            });
+                else{
+                    console.log("success: " + conf);
+                    resolve(conf);
+                }
+            })
+        // let conditions = {_id: ObjectId(confId)},
+        //     update = {"lectures" : confLectures},
+        //     opts = {new:true};
+        // Conf.update(conditions, update, opts,
+        //     (err, obj) => {
+        //         if(err) {
+        //             reject({"error": err});
+        //             console.log('addManyLectures STATUS: FAILED' + err);
+        //         } else{
+        //             console.log(`addManyLectures STATUS: SUCCESS`);
+        //             resolve(obj);
+        //         }
+        //     });
     });
 }
 

@@ -215,7 +215,8 @@ function getAllConfs(req, res){
 function addManyLectures(req, res){
     let confLectures   = req.body.confLectures;
     let confId     = req.body.confId;
-    managerService.addManyLectures(confLectures, confId)
+    let confTopics     = req.body.confTopics;
+    managerService.addManyLectures(confLectures, confId, confTopics)
         .then(function(status) {
             res.status(200).json(status);
         })
