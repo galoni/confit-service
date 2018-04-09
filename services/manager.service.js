@@ -134,7 +134,7 @@ function createConference(name, type, logo, start_date, duration, location, audi
   });
 }
 
-function createLecture(name, lecturer_name, description, duration, ratings, topics){
+function createLecture(name, lecturer_name, description, duration){
   return new Promise((resolve, reject) => {
     lecture.findOne({name : name},
       (err, lct) => {
@@ -147,20 +147,12 @@ function createLecture(name, lecturer_name, description, duration, ratings, topi
             return resolve("error : exist NAME");
         }
         else{
-            let sTopics = [];
           console.log('Trace: createLecture('+name+','+lecturer_name+')');
-            console.log("length: " + topics.length);
-            for (let i=0; i < topics.length; i++){
-                sTopics.push(topics[i]);
-            }
-            console.log("sTopics: " + sTopics);
             let newLecture = new lecture({
             name : name,
             lecturer_name : lecturer_name,
             description : description,
             duration : duration,
-            ratings : ratings,
-            topic : sTopics,
           });
           console.log('CREATE LECTURE STATUS: SUCCESS ' + name);
           newLecture.save((err, lct) => {
@@ -177,7 +169,7 @@ function createLecture(name, lecturer_name, description, duration, ratings, topi
               doc = {
                 qr_code: qr_code
               }
-              newLecture.update({_id: lct["_id"]}, doc, function(err, raw) {
+              lecture.update({_id: lct["_id"]}, doc, function(err, raw) {
                 if (err){
                   reject ("could not update qr_code")
                 }
