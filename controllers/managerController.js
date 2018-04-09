@@ -126,7 +126,7 @@ function removeLecture(req, res) {
 }
 
 function getConfById(req, res){
-    managerService.getConfById(req.body.id)
+    managerService.getConfById(req.body.confId)
         .then(function (conf) {
             if (conf) {
                 console.log("confernce:" + conf);
