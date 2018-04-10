@@ -60,7 +60,7 @@ function createVisitor(req, res) {
 }
 
 function registerToConf(req, res) {
-  visitorService.registerToConf(req.body.visitorid, req.body.confid,req.body.connection_precent,req.body.learn_precent,req.body.explore_precent)
+  visitorService.registerToConf(req.body.visitorid, req.body.confid,req.body.confname,req.body.connection_precent,req.body.learn_precent,req.body.explore_precent)
       .then(function(status) {
           res.status(200).json({"status": status});
       })

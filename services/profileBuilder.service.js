@@ -105,7 +105,7 @@ function createVisitor(first_name,last_name, linkdin, education, occupation){
 }
 
 function registerToConf
-(visitorid, confid,connection_precent,learn_precent,explore_precent) {
+(visitorid, confid,confname,connection_precent,learn_precent,explore_precent) {
   console.log("Trace: registerToConf("+confid+") by visitor: ("+visitorid+")");
     var all=parseInt(connection_precent)+parseInt(learn_precent)+parseInt(explore_precent);
     console.log("all=" + all);
@@ -117,6 +117,7 @@ function registerToConf
     +explore_precent*0.01+learn_precent*0.1;
     var confs=[];
     confs.push({"confId":confid,
+                "confname":confname,
                "connection_precent":connection_precent,
                "explore_precent":explore_precent,
                "learn_precent":learn_precent,
@@ -203,11 +204,11 @@ function updatePreffered_lectures
     return new Promise((resolve, reject) => {
     Visitor.update(
     {
-        "_id" :visitorid, 
+        "_id" :visitorid,
         "confs.confId": confid
-    }, 
+    },
     {
-        "$set": { 
+        "$set": {
             "confs.$.preffered_lectures": preffered_lectures
         }
     },
@@ -265,11 +266,11 @@ function setTopics
     return new Promise((resolve, reject) => {
     Visitor.update(
     {
-        "_id" :visitorid, 
+        "_id" :visitorid,
         "confs.confId": confid
-    }, 
+    },
     {
-        "$push": { 
+        "$push": {
             "confs.$.mainTopic": mainTopic
         }
     },
