@@ -79,24 +79,26 @@ function createVisitor(first_name,last_name, linkdin, education, occupation){
               reject("error");
             }
             else{
-              var qr_code = qrcodeApi.createImage(visitor["_id"],visitor["linkedin"], 'visitor')
-              if (!qr_code){
-                  console.log("failed to create qr_code");
-                  reject("failed to create qr_code");
-              }
-              doc = {
-                qr_code: qr_code
-              }
-              Visitor.update({_id: visitor["_id"]}, doc, function(err, raw) {
-                if (err){
-                  reject ("could not update qr_code")
+              qrcodeApi.createImage(visitor["_id"],visitor["linkedin"], 'visitor', function(qr_code, err){
+                if (!qr_code){
+                    console.log("failed to create qr_code");
+                    reject("failed to create qr_code");
                 }
-                else{
-                  console.log("Added qr_code to "+ visitor["_id"]);
+                doc = {
+                  qr_code: qr_code
                 }
+                Visitor.update({_id: visitor["_id"]}, doc, function(err, raw) {
+                  if (err){
+                    reject ("could not update qr_code")
+                  }
+                  else{
+                    console.log("Added qr_code to "+ visitor["_id"]);
+                  }
+                })
+                console.log("new newVisitor: " + visitor);
+                resolve(visitor);
               })
-              console.log("new newVisitor: " + visitor);
-              resolve(visitor);
+
             }
           })
         }
