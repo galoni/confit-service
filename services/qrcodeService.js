@@ -42,12 +42,20 @@ function createImagePromise(id, data, type) {
 }
 
 function uploadToS3(keyName, file, cb) {
+
+  fs.readFile(file, function (err,img) {
+  if (err) {
+    return console.log(err);
+  }
+  let stats = fs.statSync(file);
+  console.log("file size: " + stats.size);
   var params = {
     Bucket: consts.AWS_QRCODE_BUCKET,
     Key: keyName,
-    Body: file
+    Body: img,
+    ACL:'public-read'
   };
-  s3.putObject(params, function(err, data) {
+  s3.putObject(params, function(err, file) {
     if (err) {
       console.log(err);
       cb (null);
@@ -56,6 +64,8 @@ function uploadToS3(keyName, file, cb) {
       cb (keyName);
     }
   });
+});
+
 }
 
 function createImage(id, data, type, cb) {
@@ -72,30 +82,30 @@ function createImage(id, data, type, cb) {
     id: id
   }
   // filename -> '110ec58a-a0f2-4ac4-8393-c866d813b8d1'
-  var qr = QRCode.toFile(consts.QRCODELIB + filename, JSON.stringify(qrjson), {
+  QRCode.toFile(consts.QRCODELIB + filename, JSON.stringify(qrjson), {
     color: {
       dark: '#02729a', // Blue dots
       light: '#FFFF' // Transparent background
     }
   }, function(err) {
     if (err) throw err
-  })
-  uploadToS3(filename, consts.QRCODELIB + filename, function(uploaded){
-    if (uploaded != null) {
-      var urlParams = {
-        Bucket: consts.AWS_QRCODE_BUCKET,
-        Key: uploaded
-      };
-      s3.getSignedUrl('getObject', urlParams, function(err, url) {
-        console.log('the url of the image is ', url);
-      })
-      deleteImage(uploaded);
-      cb (uploaded, null);
-    }
-    else{
-      console.log("could not upload to AWS");
-      cb(null, "could not upload to AWS")
-    }
+    uploadToS3(filename, consts.QRCODELIB + filename, function(uploaded){
+      if (uploaded != null) {
+        var urlParams = {
+          Bucket: consts.AWS_QRCODE_BUCKET,
+          Key: uploaded
+        };
+        s3.getSignedUrl('getObject', urlParams, function(err, url) {
+          console.log('the url of the image is ', url);
+        })
+        deleteImage(uploaded);
+        cb (uploaded, null);
+      }
+      else{
+        console.log("could not upload to AWS");
+        cb(null, "could not upload to AWS")
+      }
+    });
   });
 
 };
@@ -112,13 +122,15 @@ function deleteImage(filename) {
 };
 
 //get a QR image
-function getImage(filename, cb) {
-  var img = fs.readFileSync(consts.QRCODELIB + filename);
-  if (!img) {
-    console.log("filename not exist");
-    return null
-  }
-  console.log("deleted " + filename);
-  return cb(img);
+function getImage(fileKey, cb) {
+  var fileKey;
+    console.log('Trying to download file', fileKey);
+    var options = {
+        Bucket    : consts.AWS_QRCODE_BUCKET,
+        Key    : fileKey,
+    };
 
+    res.attachment(fileKey);
+    var fileStream = s3.getObject(options).createReadStream();
+    fileStream.pipe(res);
 };
