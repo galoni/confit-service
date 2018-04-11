@@ -110,24 +110,26 @@ function createConference(name, type, logo, start_date, duration, location, audi
               reject("error");
             }
             else{
-              let qr_code = qrcodeApi.createImage(cnf["_id"],cnf["name"], 'conference');
-              if (!qr_code){
-                  console.log("failed to create qr_code");
-                  reject("failed to create qr_code");
-              }
-              doc = {
-                qr_code: qr_code
-              };
-              Conf.update({_id: cnf["_id"]}, doc, function(err, raw) {
-                if (err){
-                  reject ("could not update qr_code")
+              qrcodeApi.createImage(cnf["_id"],cnf["name"], 'conference', function(qr_code, err){
+                if (!qr_code){
+                    console.log("failed to create qr_code");
+                    reject(err);
                 }
-                else{
-                  console.log("Added qr_code to "+ cnf["_id"]);
+                doc = {
+                  qr_code: qr_code
                 }
-              });
-              console.log("new conference: " + cnf);
-              resolve(cnf);
+                Conf.update({_id: cnf["_id"]}, doc, function(err, raw) {
+                  if (err){
+                    reject ("could not update qr_code")
+                  }
+                  else{
+                    console.log("Added qr_code to "+ cnf["_id"]);
+                  }
+                })
+                console.log("new conference: " + cnf);
+                resolve(cnf);
+              })
+
             }
           })
         }
@@ -163,24 +165,26 @@ function createLecture(name, lecturer_name, description, topic, ratings){
               reject("error");
             }
             else{
-              let qr_code = qrcodeApi.createImage(lct["_id"],lct["name"], 'lecture');
-              if (!qr_code){
-                  console.log("failed to create qr_code");
-                  reject("failed to create qr_code");
-              }
-              doc = {
-                qr_code: qr_code
-              };
-              lecture.update({_id: lct["_id"]}, doc, function(err, raw) {
-                if (err){
-                  reject ("could not update qr_code")
+              qrcodeApi.createImage(lct["_id"],lct["name"], 'lecture', function(qr_code, err){
+                if (!qr_code){
+                    console.log("failed to create qr_code");
+                    reject("failed to create qr_code");
                 }
-                else{
-                  console.log("Added qr_code to "+ lct["_id"]);
+                doc = {
+                  qr_code: qr_code
                 }
-              });
-              console.log("new lcture: " + lct);
-              resolve(lct);
+                lecture.update({_id: lct["_id"]}, doc, function(err, raw) {
+                  if (err){
+                    reject ("could not update qr_code")
+                  }
+                  else{
+                    console.log("Added qr_code to "+ lct["_id"]);
+                  }
+                })
+                console.log("new lcture: " + lct);
+                resolve(lct);
+              })
+
             }
           })
         }
