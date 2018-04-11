@@ -78,7 +78,7 @@ function addVisitorTocConf(visitorid, confid){
 //   });
 // }
 
-function createConference(name, type, logo, start_date, duration, location, audience){
+function createConference(name, type, logo, start_date, duration, location, audience, main_topics){
   return new Promise((resolve, reject) => {
     Conf.findOne({name : name},
       (err, cnf) => {
@@ -100,6 +100,7 @@ function createConference(name, type, logo, start_date, duration, location, audi
             duration : duration,
             audience : audience,
             location : location,
+            main_topics : main_topics,
             qr_code : ''
           });
           console.log('createConference STATUS: SUCCESS ' + name);
@@ -136,7 +137,7 @@ function createConference(name, type, logo, start_date, duration, location, audi
   });
 }
 
-function createLecture(name, lecturer_name, description, duration, ratings, topics){
+function createLecture(name, lecturer_name, description, topic, ratings){
   return new Promise((resolve, reject) => {
     lecture.findOne({name : name},
       (err, lct) => {
@@ -149,14 +150,13 @@ function createLecture(name, lecturer_name, description, duration, ratings, topi
             return resolve("error : exist NAME");
         }
         else{
-          console.log('Trace: createLecture('+name+','+topics+')');
+          console.log('Trace: createLecture('+name+','+lecturer_name+')');
             let newLecture = new lecture({
             name : name,
             lecturer_name : lecturer_name,
             description : description,
-            duration : duration,
-            ratings : ratings,
-            topic : topics
+            topic : topic,
+            ratings : ratings
           });
           console.log('CREATE LECTURE STATUS: SUCCESS ' + name);
           newLecture.save((err, lct) => {
@@ -403,7 +403,7 @@ function getAllConfs(){
 }
 
 
-function addManyLectures(confLectures, confId, confTopics){
+function addManyLectures(confLectures, confId){
     console.log('Trace: addManyLectures('+confLectures+','+confId+')');
     return new Promise((resolve, reject) => {
         Conf.update({
@@ -411,7 +411,7 @@ function addManyLectures(confLectures, confId, confTopics){
         },{
             "$set":{
                 "lectures" : confLectures,
-                "main_topics": confTopics
+                // "main_topics": confTopics
             }
         },
             function(err, conf){
