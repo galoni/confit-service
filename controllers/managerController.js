@@ -59,7 +59,9 @@ function createConference(req, res) {
   let duration      = req.body.duration;
   let location      = req.body.location;
   let audience      = req.body.audience;
-  managerService.createConference(name, type, logo, start_date, duration, location, audience)
+  let main_topics   = req.body.main_topics;
+  console.log("data: " +main_topics);
+  managerService.createConference(name, type, logo, start_date, duration, location, audience, main_topics)
       .then(function(status) {
           res.status(200).json(status);
       })
@@ -71,12 +73,11 @@ function createConference(req, res) {
 function createLecture(req, res) {
   let name          = req.body.name;
   let lecturer_name = req.body.lecturer_name;
-  let duration      = req.body.duration;
+  let topic      = req.body.topic;
   let description   = req.body.description;
   let ratings       = req.body.ratings;
-  let topics        = req.body.topics;
-  console.log("data: " +topics);
-  managerService.createLecture(name, lecturer_name, description, duration, ratings, topics)
+
+  managerService.createLecture(name, lecturer_name, description, topic, ratings)
       .then(function(status) {
           res.status(200).json(status);
       })
