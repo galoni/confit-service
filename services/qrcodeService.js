@@ -1,10 +1,20 @@
-var QRCode = require('qrcode')
+var QRCode = require('qrcode');
 var uuid = require('node-uuid');
+
 const fs = require('fs');
 const consts = require('../consts');
 var AWS = require('aws-sdk');
 AWS.config.update(consts.AWS_KEYS);
 var s3 = new AWS.S3();
+var join = require('path').join;
+var s3Zip = require('s3-zip');
+
+var config = {
+  accessKeyId: "AKIAJB2PN4H56GCR34JA",
+  secretAccessKey: "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",
+  region: "eu-central-1",
+  bucket: consts.AWS_QRCODE_BUCKET
+};
 
 
 var service = {};
@@ -14,6 +24,9 @@ service.createImage = createImage;
 service.deleteImage = deleteImage;
 service.getImage = getImage;
 service.createImagePromise = createImagePromise;
+service.uploadToS3 = uploadToS3;
+service.get_multiple_images = get_multiple_images;
+
 module.exports = service;
 
 function createStringQRCode(linkedin) {
@@ -31,40 +44,40 @@ function createStringQRCode(linkedin) {
 
 function createImagePromise(id, data, type) {
   return new Promise((resolve, reject) => {
-  createImage(id, data, type, function(answer, err){
-    if (answer) {
-      resolve(answer);
-    } else {
-      reject(err);
-    }
+    createImage(id, data, type, function(answer, err) {
+      if (answer) {
+        resolve(answer);
+      } else {
+        reject(err);
+      }
+    });
   });
-});
 }
 
 function uploadToS3(keyName, file, cb) {
 
-  fs.readFile(file, function (err,img) {
-  if (err) {
-    return console.log(err);
-  }
-  let stats = fs.statSync(file);
-  console.log("file size: " + stats.size);
-  var params = {
-    Bucket: consts.AWS_QRCODE_BUCKET,
-    Key: keyName,
-    Body: img,
-    ACL:'public-read'
-  };
-  s3.putObject(params, function(err, file) {
+  fs.readFile(file, function(err, img) {
     if (err) {
-      console.log(err);
-      cb (null);
-    } else {
-      console.log("Successfully uploaded image to " + consts.AWS_QRCODE_BUCKET + "/" + keyName);
-      cb (keyName);
+      return console.log(err);
     }
+    let stats = fs.statSync(file);
+    console.log("file size: " + stats.size);
+    var params = {
+      Bucket: consts.AWS_QRCODE_BUCKET,
+      Key: keyName,
+      Body: img,
+      ACL: 'public-read'
+    };
+    s3.putObject(params, function(err, file) {
+      if (err) {
+        console.log(err);
+        cb(null);
+      } else {
+        console.log("Successfully uploaded image to " + consts.AWS_QRCODE_BUCKET + "/" + keyName);
+        cb(keyName);
+      }
+    });
   });
-});
 
 }
 
@@ -89,7 +102,7 @@ function createImage(id, data, type, cb) {
     }
   }, function(err) {
     if (err) throw err
-    uploadToS3(filename, consts.QRCODELIB + filename, function(uploaded){
+    uploadToS3(filename, consts.QRCODELIB + filename, function(uploaded) {
       if (uploaded != null) {
         var urlParams = {
           Bucket: consts.AWS_QRCODE_BUCKET,
@@ -99,9 +112,8 @@ function createImage(id, data, type, cb) {
           console.log('the url of the image is ', url);
         })
         deleteImage(uploaded);
-        cb (uploaded, null);
-      }
-      else{
+        cb(uploaded, null);
+      } else {
         console.log("could not upload to AWS");
         cb(null, "could not upload to AWS")
       }
@@ -124,13 +136,67 @@ function deleteImage(filename) {
 //get a QR image
 function getImage(fileKey, cb) {
   var fileKey;
-    console.log('Trying to download file', fileKey);
-    var options = {
-        Bucket    : consts.AWS_QRCODE_BUCKET,
-        Key    : fileKey,
-    };
+  console.log('Trying to download file', fileKey);
+  var options = {
+    Bucket: consts.AWS_QRCODE_BUCKET,
+    Key: fileKey,
+  };
 
-    res.attachment(fileKey);
-    var fileStream = s3.getObject(options).createReadStream();
-    fileStream.pipe(res);
+  res.attachment(fileKey);
+  var fileStream = s3.getObject(options).createReadStream();
+  fileStream.pipe(res);
 };
+
+//zip conference
+function get_multiple_images(confId) {
+    console.log(confId);
+    var Manager = require('./manager.service');
+      return new Promise((resolve, reject) => {
+    let _program = Manager.getConfById(confId)
+      .then((conf) => {
+        if (conf) {
+          console.log("got conf: " + conf);
+          var region = consts.AWS_KEYS.region;
+          var bucket = consts.AWS_QRCODE_BUCKET;
+          var folder = '.';
+          var output = fs.createWriteStream(join(consts.QRCODELIB, conf.name+'.zip'));
+          var files = [];
+          conf.lectures.forEach(function(lct){
+            files.push(lct.qr_code);
+          });
+          console.log(files);
+          s3Zip
+            .archive({
+              region: region,
+              bucket: bucket
+            }, null, files)
+            .pipe(output)
+            .on('finish', function() {
+              console.log("Created zip");
+              uploadToS3(conf.name+'.zip', consts.QRCODELIB + conf.name+'.zip', function(uploaded) {
+                if (uploaded != null) {
+                  var urlParams = {
+                    Bucket: consts.AWS_QRCODE_BUCKET,
+                    Key: uploaded
+                  };
+                  s3.getSignedUrl('getObject', urlParams, function(err, url) {
+                    console.log('the url of the image is ', url);
+                  })
+                  // deleteImage(conf.name+'.zip');
+                  // cb (uploaded, null);
+                  resolve(uploaded);
+                } else {
+                  console.log("could not upload to AWS");
+                  reject ("could not upload to AWS");
+                }
+              });
+            });
+
+        } else {
+          console.log("did not find conf");
+          reject("did not find conf");
+        }
+
+        });
+      });
+  };

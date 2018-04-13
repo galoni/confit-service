@@ -24,13 +24,18 @@ service.addManyLectures         = addManyLectures;
 service.createProgram           = createProgram;
 service.getAllConfs             = getAllConfs;
 service.addVisitorTocConf       = addVisitorTocConf;
+service.addPreffered_lectures   = addPreffered_lectures;
+
 
 module.exports = service;
 
 function addVisitorTocConf(visitorid, confid){
+  var visitor=[];
+  visitor.push({"visitorid":visitorid,"preffered_lectures":[]});
+
   console.log('Trace: addVisitorTocConf('+visitorid+','+confid+')');
     Conf.findByIdAndUpdate(confid,
-    {$push: {visitors: visitorid}},
+    {$push: {visitors: visitor}},
     {safe: true, upsert: true},
     function(err, doc) {
         if(err){
@@ -41,6 +46,30 @@ function addVisitorTocConf(visitorid, confid){
     }
 );
 }
+
+function addPreffered_lectures(visitorid, confid,preffered_lectures){
+  console.log("preffered_lectures"+preffered_lectures);
+  console.log('Trace: addPreffered_lecturesToConf('+visitorid+','+confid+')');
+  Conf.update(
+  {
+      "_id" :confid,
+      "visitors.visitorid": visitorid
+  },
+  {
+      "$set": {
+          "visitors.$.preffered_lectures": preffered_lectures
+      }
+  },
+    function(err, doc) {
+        if(err){
+        console.log(err);
+        }else{
+        console.log("success "+confid+" updated");
+        }
+    }
+);
+}
+
 
 
 // function createSession(name, session_type, duration){

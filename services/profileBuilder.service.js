@@ -17,7 +17,6 @@ service.getVisitorById=getVisitorById;
 service.updateProfilePie=updateProfilePie;
 service.updatePreffered_lectures=updatePreffered_lectures;
 service.setTopics=setTopics;
-
 //service.matching=matching;
 
 //service.getPie=getPie;
@@ -60,16 +59,11 @@ function createVisitor(first_name,last_name, linkdin, education, occupation){
         }
         else{
           console.log('Trace: createVisitor('+first_name+','+last_name+')');
-            //var newname = {first_name:first_name, last_name:last_name};
           var newVisitor = new Visitor({
               name :{first_name:first_name,last_name:last_name},
               linkedin : linkdin,
               education : education,
               occupation : occupation,
-              //profile_pie:0,
-              //connection_percent:0.3,
-              //explore_percent:0.3,
-              //learn_percent:0.3,
               qr_code : ''
           });
           console.log('createVisitor STATUS: SUCCESS ' + first_name);
@@ -220,6 +214,7 @@ function updatePreffered_lectures
             reject({"error": err});
         }else{
         console.log("success "+visitorid+" updated");
+            managerService.addPreffered_lectures(visitorid,confid,preffered_lectures);
             resolve(true);
         }
     });
