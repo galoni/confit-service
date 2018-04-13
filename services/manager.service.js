@@ -50,6 +50,9 @@ function addVisitorTocConf(visitorid, confid){
 function addPreffered_lectures(visitorid, confid,preffered_lectures){
   console.log("preffered_lectures"+preffered_lectures);
   console.log('Trace: addPreffered_lecturesToConf('+visitorid+','+confid+')');
+  preffered_lectures.forEach(function(lecture) {
+  addRating(lecture);
+});
   Conf.update(
   {
       "_id" :confid,
@@ -70,6 +73,26 @@ function addPreffered_lectures(visitorid, confid,preffered_lectures){
 );
 }
 
+function addRating(lecture1){
+  console.log('Trace: addRating('+lecture1+')');
+  lecture.update(
+  {
+      "_id" :lecture1,
+  },
+  {
+      "$inc": {
+          "ratings": 1
+      }
+  },
+    function(err, doc) {
+        if(err){
+        console.log(err);
+        }else{
+        console.log("success "+lecture1+" updated");
+        }
+    }
+);
+}
 
 
 // function createSession(name, session_type, duration){
