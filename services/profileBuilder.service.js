@@ -215,6 +215,7 @@ function updatePreffered_lectures
         }else{
         console.log("success "+visitorid+" updated");
             managerService.addPreffered_lectures(visitorid,confid,preffered_lectures);
+            //managerService.addRating(lecture1,lecture2,lecture3);
             resolve(true);
         }
     });
