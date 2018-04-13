@@ -17,7 +17,7 @@ function buildProgram(confId) {
       let sortLectures = conf.lectures.sort(function(a, b) {
         return b.ratings - a.ratings
       });
-        console.log('Trace: sortLectures ' + JSON.stringify(sortLectures));
+        // console.log('Trace: sortLectures ' + JSON.stringify(sortLectures));
       let topics = [];
       let topicsLectures = [];
       for (let tIndex = 0; tIndex < conf.main_topics.length; tIndex++){//split all sorted lectures by topic
@@ -26,15 +26,20 @@ function buildProgram(confId) {
       }
       // console.log("topics: " + JSON.stringify(topics));
       // console.log("topicsLectures: " + JSON.stringify(topicsLectures));
-      for (let sIndex = 0; sIndex < sortProgram.length; sIndex++){ //clear the lectures array
+      let spLength =  sortProgram.length;
+      for (let sIndex = 0; sIndex < spLength; sIndex++){ //clear the lectures array
         sortProgram[sIndex].lectures = [];
       }
-      for (let tIndex = 0; tIndex < topics.length; tIndex++) {
+      for (let tIndex = 0; tIndex < topics.length; tIndex++) {//outer loop iterate over topic
           let lIndex = 0;
+          for (let j = 0; j < tIndex; j++){//shift evey topic array
+              topicsLectures[tIndex].push(topicsLectures[tIndex].shift());
+          }
           // console.log("loop topicsLectures: " + JSON.stringify(topicsLectures[tIndex]));
-          while (lIndex < topicsLectures[tIndex].length) {
-              for (let sIndex = 0; sIndex < sortProgram.length; sIndex++) {
+          while (lIndex < topicsLectures[tIndex].length) {//loop of evey lecture
+              for (let sIndex = 0; sIndex < spLength; sIndex++) {
                   // console.log('Trace: sortProgram ' + JSON.stringify(sortProgram[sIndex]));
+
                   if (topicsLectures[tIndex][lIndex] != null) {
                       // console.log('Trace: topicsLectures ' + JSON.stringify(topicsLectures[tIndex][lIndex]));
                       sortProgram[sIndex].lectures.push(topicsLectures[tIndex][lIndex]);
@@ -50,9 +55,9 @@ function buildProgram(confId) {
                               console.log('update conf STATUS: FAILED' + err);
                           } else {
                               console.log(`update conf STATUS: SUCCESS`);
-                              // conf.visitors.forEach(function(visitorId) {
-                              //   pathBuilder.buildPath(confId, visitorId);
-                              // });
+                              conf.visitors.forEach(function(visitorId) {
+                                pathBuilder.buildPath(confId, visitorId);
+                              });
                               sortProgram.sort(function (a, b) {
                                   return a.dayNum - b.dayNum
                               });
@@ -64,9 +69,9 @@ function buildProgram(confId) {
           }
       }
       console.log(`sorted finish: ${JSON.stringify(sortProgram)}`);
-      // conf.visitors.forEach(function(visitorId) {
-      //   pathBuilder.buildPath(confId, visitorId);
-      // });
+      conf.visitors.forEach(function(visitorId) {
+        pathBuilder.buildPath(confId, visitorId);
+      });
       sortProgram.sort(function(a, b) {
           return a.dayNum - b.dayNum
       });
