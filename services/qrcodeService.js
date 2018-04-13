@@ -1,18 +1,15 @@
 var QRCode = require('qrcode');
 var uuid = require('node-uuid');
-
 const fs = require('fs');
 const consts = require('../consts');
 var AWS = require('aws-sdk');
-AWS.config.update(consts.AWS_KEYS);
+var credentials = new AWS.SharedIniFileCredentials({profile: 'confit'});
+AWS.config.credentials = credentials;
 var s3 = new AWS.S3();
 var join = require('path').join;
 var s3Zip = require('s3-zip');
 
 var config = {
-  accessKeyId: "AKIAJB2PN4H56GCR34JA",
-  secretAccessKey: "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",
-  region: "eu-central-1",
   bucket: consts.AWS_QRCODE_BUCKET
 };
 
@@ -156,7 +153,7 @@ function get_multiple_images(confId) {
       .then((conf) => {
         if (conf) {
           console.log("got conf: " + conf);
-          var region = consts.AWS_KEYS.region;
+          var region = consts.AWS_REGION;
           var bucket = consts.AWS_QRCODE_BUCKET;
           var folder = '.';
           var output = fs.createWriteStream(join(consts.QRCODELIB, conf.name+'.zip'));

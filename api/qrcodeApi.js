@@ -3,7 +3,8 @@ var router = express.Router();
 var qrcodeService = require('../services/qrcodeService');
 var consts = require('../consts.js');
 var AWS = require('aws-sdk');
-AWS.config.update(consts.AWS_KEYS);
+var credentials = new AWS.SharedIniFileCredentials({profile: 'confit'});
+AWS.config.credentials = credentials;
 var s3 = new AWS.S3();
 var fs = require('fs')
 var join = require('path').join
