@@ -51,7 +51,7 @@ function addPreffered_lectures(visitorid, confid,preffered_lectures){
   console.log("preffered_lectures"+preffered_lectures);
   console.log('Trace: addPreffered_lecturesToConf('+visitorid+','+confid+')');
   preffered_lectures.forEach(function(lecture) {
-  addRating(lecture);
+  addRating(lecture,confid);
 });
   Conf.update(
   {
@@ -73,15 +73,16 @@ function addPreffered_lectures(visitorid, confid,preffered_lectures){
 );
 }
 
-function addRating(lecture1){
+function addRating(lecture1,confid){
   console.log('Trace: addRating('+lecture1+')');
-  lecture.update(
+  Conf.update(
   {
-      "_id" :lecture1,
+      "_id" :confid,
+      "lectures._id":lecture1
   },
   {
       "$inc": {
-          "ratings": 1
+          "lectures.$.ratings": 1
       }
   },
     function(err, doc) {
