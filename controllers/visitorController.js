@@ -11,10 +11,13 @@ router.post('/registerToConf', registerToConf);
 router.post('/createVisitor', createVisitor);
 //router.post('/updateProfilePie', updateProfilePie);
 router.post('/updatePreffered_lectures', updatePreffered_lectures);
+router.post('/appendPrefferedLecture', appendPrefferedLecture);
 router.post('/getConfsVisitor', getConfsVisitor);
 router.post('/buildPath', buildPath);
 router.post('/getVisitorById', getVisitorById);
 router.post('/setTopics', setTopics);
+router.post('/appendTopic', appendTopic);
+
 module.exports = router;
 
 function getVisitorById(req, res){
@@ -80,6 +83,15 @@ function registerToConf(req, res) {
       });
 }*/
 
+function appendTopic(req, res) {
+  visitorService.appendTopic(req.body.visitorid, req.body.confid,req.body.topic)
+      .then(function(status) {
+          res.status(200).json({"status": status});
+      })
+      .catch(function (err) {
+          res.status(400).send(err);
+      });
+}
 
 function setTopics(req, res) {
   visitorService.setTopics(req.body.visitorid, req.body.confid,req.body.topic1,req.body.topic2,req.body.topic3)
@@ -93,6 +105,16 @@ function setTopics(req, res) {
 
 function getConfsVisitor(req, res) {
   visitorService.getConfsVisitor(req.body.visitorid)
+      .then(function(status) {
+          res.status(200).json({"status": status});
+      })
+      .catch(function (err) {
+          res.status(400).send(err);
+      });
+}
+
+function appendPrefferedLecture(req, res) {
+  visitorService.appendPrefferedLecture(req.body.visitorid,req.body.confid,req.body.lecture)
       .then(function(status) {
           res.status(200).json({"status": status});
       })

@@ -228,14 +228,16 @@ function createLecture(name, lecturer_name, description, topic, ratings){
                 }
                 lecture.update({_id: lct["_id"]}, doc, function(err, raw) {
                   if (err){
-                    reject ("could not update qr_code")
+                    reject ("could not update qr_code");
                   }
                   else{
                     console.log("Added qr_code to "+ lct["_id"]);
+                    lct.qr_code=qr_code;
+                    console.log("new lcture: " + lct);
+                    resolve(lct);
                   }
                 })
-                console.log("new lcture: " + lct);
-                resolve(lct);
+
               })
 
             }
