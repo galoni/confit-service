@@ -9,7 +9,7 @@ var consts = require('../consts.js');
 router.post('/matching', matching);
 router.post('/registerToConf', registerToConf);
 router.post('/createVisitor', createVisitor);
-router.post('/updateProfilePie', updateProfilePie);
+//router.post('/updateProfilePie', updateProfilePie);
 router.post('/updatePreffered_lectures', updatePreffered_lectures);
 router.post('/getConfsVisitor', getConfsVisitor);
 router.post('/buildPath', buildPath);
@@ -70,7 +70,7 @@ function registerToConf(req, res) {
 }
 
 
-function updateProfilePie(req, res) {
+/*function updateProfilePie(req, res) {
   visitorService.updateProfilePie(req.body.visitorid, req.body.connection_percent,req.body.explore_percent,req.body.learn_percent)
       .then(function(status) {
           res.status(200).json({"status": status});
@@ -78,7 +78,7 @@ function updateProfilePie(req, res) {
       .catch(function (err) {
           res.status(400).send(err);
       });
-}
+}*/
 
 
 function setTopics(req, res) {
