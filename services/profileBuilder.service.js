@@ -13,7 +13,6 @@ var service = {};
 service.createVisitor=createVisitor;
 service.registerToConf=registerToConf;
 service.getVisitorById=getVisitorById;
-//service.getConfsVisitor=getConfsVisitor;
 service.updateProfilePie=updateProfilePie;
 service.updatePreffered_lectures=updatePreffered_lectures;
 service.setTopics=setTopics;
@@ -141,6 +140,7 @@ function registerToConf
           else{
             console.log(`Saved document: ${visitor._id}`);
             managerService.addVisitorTocConf(visitorid,confid);
+
             resolve(true);
           }
         });
@@ -166,11 +166,122 @@ function getVisitorById(visitorid){
         });
   });
 }
-function updateProfilePie(visitorid, connection_percent,explore_percent,learn_percent) {
-    var profilePie=connection_percent*0.001
-    +explore_percent*0.01+learn_percent*0.1;
+function updateProfilePie(visitorid,confid ,lecture1,lecture2,lecture3) {
+  var visitorOn;
+  var confOn;
+  var lecturesOn;
+  var lecturesID=[];
+  var numoflectures;
+  var topicOn;
+  var topics;
+  var value_topics=[0.1,0.01,0.001];
+  var value_topics_index=[1,2,3];
+  var profile_pie_topics=0;
+  var flag1,glag2,flag3=false;
+  var profilePieExist;
   console.log("Trace: updateProfilePie("+visitorid+")");
-    return new Promise((resolve, reject) => {
+  Visitor.findOne({_id: ObjectId(visitorid)},
+      (err, visitor) => {
+        if(err) {
+          console.log('visitorFindOne STATUS: FAILED');
+        }
+        console.log('visitorFindOne STATUS: SUCCESS');
+        if(!visitor) {
+          console.log("info : wrong conf id");
+          return resolve("error : wrong conf id");
+        }
+        this.visitorOn=visitor;
+        Conf.findOne({_id: ObjectId(confid)},
+            (err, conf) => {
+              if(err) {
+                console.log('confFindOne STATUS: FAILED');
+              }
+              console.log('confFindOne STATUS: SUCCESS');
+              if(!visitor) {
+                console.log("info : wrong conf id");
+                return resolve("error : wrong conf id");
+              }
+              this.confOn=conf;
+              console.log("visitorOn :"+this.visitorOn);
+              console.log("confOn :"+this.confOn);
+              this.lecturesOn=this.confOn.lectures;
+              this.numoflectures=this.confOn.lectures.length;
+              this.topics=this.confOn.main_topics;
+              console.log(this.topics);
+              /*for(let i=0;i<this.numoflectures;i++){
+                console.log("this.lecturesOn[i]._id :"+ this.lecturesOn[i]._id);
+                lecturesID.push(JSON.stringify(this.lecturesOn[i]._id));
+                //console.log("this.lecturesOn[i]._id :"+ this.lecturesOn[i]._id);
+              }
+              console.log(lecturesID);*/
+              for(let i=0;i<this.numoflectures;i++){
+                if(this.confOn.lectures[i]._id===lecture1){
+                  this.topicOn=this.confOn.lectures[i].topic;
+                  //console.log(this.topicOn);
+                  var index = this.topics.indexOf(this.topicOn);
+                  //console.log(index);
+                  //console.log("this.value_topics[index]="+value_topics[index]);
+                  //console.log("value_topics_index[index]="+value_topics_index[index]);
+                  profile_pie_topics=profile_pie_topics+value_topics[index]*value_topics_index[index];
+                  console.log("profilePie= "+profile_pie_topics);
+                }
+                else if(this.confOn.lectures[i]._id===lecture2){
+                  this.topicOn=this.confOn.lectures[i].topic;
+                  //console.log(this.topicOn);
+                  var index = this.topics.indexOf(this.topicOn);
+                  //console.log(index);
+                  //console.log("this.value_topics[index]="+value_topics[index]);
+                  //console.log("value_topics_index[index]="+value_topics_index[index]);
+                  profile_pie_topics=profile_pie_topics+value_topics[index]*value_topics_index[index];
+                  console.log("profilePie= "+profile_pie_topics);
+                }
+                else if(this.confOn.lectures[i]._id===lecture3){
+                  this.topicOn=this.confOn.lectures[i].topic;
+                  //console.log(this.topicOn);
+                  var index = this.topics.indexOf(this.topicOn);
+                  //console.log(index);
+                  //console.log("this.value_topics[index]="+value_topics[index]);
+                  //console.log("value_topics_index[index]="+value_topics_index[index]);
+                  profile_pie_topics=profile_pie_topics+value_topics[index]*value_topics_index[index];
+                  console.log("profilePie= "+profile_pie_topics);
+                }
+              }
+              //console.log(this.visitorOn.confs.length);
+              //console.log(this.confOn._id);
+              for(let i=0;i<this.visitorOn.confs.length;i++){
+                if(JSON.stringify(this.confOn._id)===JSON.stringify(this.visitorOn.confs[i].confId)){
+                  profilePieExist=this.visitorOn.confs[i].profile_pie;
+                  console.log(profilePieExist);
+                }
+              }
+              console.log(profile_pie_topics);
+              profilePieExist=profilePieExist*0.6+profile_pie_topics*0.4;
+
+              console.log(profilePieExist);
+              Visitor.update(
+              {
+                  "_id" :visitorid,
+                  "confs.confId": confid
+              },
+              {
+                  "$set": {
+                      "confs.$.profile_pie": profilePieExist
+                  }
+              },
+              function(err, doc) {
+                  if(err){
+                  console.log(err);
+                      //reject({"error": err});
+                  }else{
+                  console.log("success "+visitorid+" updated");
+                      //managerService.addRating(lecture1,lecture2,lecture3);
+                      //resolve(true);
+                  }
+              });
+
+            });
+      });
+    /*return new Promise((resolve, reject) => {
           var conditions = {_id: ObjectId(visitorid)},
           update = {'profile_pie':profilePie,
                     'connection_percent':connection_percent,
@@ -188,7 +299,7 @@ function updateProfilePie(visitorid, connection_percent,explore_percent,learn_pe
                 }
             });
           resolve(true);
-    });
+    });*/
 }
 
 function appendPrefferedLecture(visitorid,confid, lecture){
@@ -243,6 +354,7 @@ function updatePreffered_lectures
         }else{
         console.log("success "+visitorid+" updated");
             managerService.addPreffered_lectures(visitorid,confid,preffered_lectures);
+            updateProfilePie(visitorid,confid,lecture1,lecture2,lecture3);
             //managerService.addRating(lecture1,lecture2,lecture3);
             resolve(true);
         }
@@ -331,6 +443,7 @@ function setTopics
             reject({"error": err});
         }else{
         console.log("success "+visitorid+" updated");
+
             resolve(true);
         }
     });
