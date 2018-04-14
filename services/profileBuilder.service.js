@@ -17,6 +17,9 @@ service.getVisitorById=getVisitorById;
 service.updateProfilePie=updateProfilePie;
 service.updatePreffered_lectures=updatePreffered_lectures;
 service.setTopics=setTopics;
+service.appendTopic=appendTopic;
+service.appendPrefferedLecture=appendPrefferedLecture;
+
 //service.matching=matching;
 
 //service.getPie=getPie;
@@ -188,7 +191,32 @@ function updateProfilePie(visitorid, connection_percent,explore_percent,learn_pe
     });
 }
 
-
+function appendPrefferedLecture(visitorid,confid, lecture){
+  console.log("Trace: appendPrefferedLecture("+visitorid+") To conference id ("+confid+") with lecture "+lecture);
+    return new Promise((resolve, reject) => {
+    Visitor.update(
+    {
+        "_id" :visitorid,
+        "confs.confId": confid
+    },
+    {
+        "$push": {
+            "confs.$.preffered_lectures": lecture
+        }
+    },
+    function(err, doc) {
+        if(err){
+        console.log(err);
+            reject({"error": err});
+        }else{
+        console.log("success "+visitorid+" updated");
+            // managerService.addPreffered_lectures(visitorid,confid,lecture);
+            //managerService.addRating(lecture1,lecture2,lecture3);
+            resolve(true);
+        }
+    });
+    });
+}
 
 function updatePreffered_lectures
 (visitorid,confid, lecture1,lecture2,lecture3) {
@@ -252,6 +280,31 @@ function updatePreffered_lectures
         }
       })
   });*/
+}
+
+function appendTopic(visitorid, confid, topic){
+  console.log("Trace: appendTopic("+visitorid+") To conference id ("+confid+")");
+    return new Promise((resolve, reject) => {
+    Visitor.update(
+    {
+        "_id" :visitorid,
+        "confs.confId": confid
+    },
+    {
+        "$push": {
+            "confs.$.mainTopic": topic
+        }
+    },
+    function(err, doc) {
+        if(err){
+        console.log(err);
+            reject({"error": err});
+        }else{
+        console.log("success "+visitorid+" updated");
+            resolve(true);
+        }
+    });
+    });
 }
 
 function setTopics

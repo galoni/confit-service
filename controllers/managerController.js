@@ -160,7 +160,7 @@ function addSessionToConf(req, res) {
 
 function addLectureToConf(req, res) {
   let lectureId   = req.body.lectureId;
-  let confId     = req.body.confId; 
+  let confId     = req.body.confId;
   managerService.addLectureToConf(lectureId, confId)
     .then(function(status) {
         res.status(200).json({"status": status});
