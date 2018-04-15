@@ -3,7 +3,9 @@ var uuid = require('node-uuid');
 const fs = require('fs');
 const consts = require('../consts');
 var AWS = require('aws-sdk');
-var credentials = new AWS.SharedIniFileCredentials({profile: 'confit'});
+var credentials = new AWS.SharedIniFileCredentials({
+  profile: 'confit'
+});
 AWS.config.credentials = credentials;
 var s3 = new AWS.S3();
 var join = require('path').join;
@@ -121,7 +123,7 @@ function createImage(id, data, type, cb) {
 //Deleting a QR image
 function deleteImage(filename) {
   console.log("filename: " + filename);
-  fs.unlink(consts.QRCODELIB + filename, (err) => {
+  fs.unlink(consts.QRCODELIB + filename.replace("%20", " "), (err) => {
     if (err) {
       throw err;
     }
@@ -146,54 +148,56 @@ function getImage(fileKey, cb) {
 
 //zip conference
 function get_multiple_images(confId) {
-    console.log(confId);
-    var Manager = require('./manager.service');
-      return new Promise((resolve, reject) => {
+  console.log(confId);
+  var Manager = require('./manager.service');
+  return new Promise((resolve, reject) => {
     let _program = Manager.getConfById(confId)
       .then((conf) => {
         if (conf) {
-          console.log("got conf: " + conf);
-          var region = consts.AWS_REGION;
-          var bucket = consts.AWS_QRCODE_BUCKET;
-          var folder = '.';
-          var output = fs.createWriteStream(join(consts.QRCODELIB, conf.name+'.zip'));
-          var files = [];
-          conf.lectures.forEach(function(lct){
-            files.push(lct.qr_code);
-          });
-          console.log(files);
-          s3Zip
-            .archive({
-              region: region,
-              bucket: bucket
-            }, null, files)
-            .pipe(output)
-            .on('finish', function() {
-              console.log("Created zip");
-              uploadToS3(conf.name+'.zip', consts.QRCODELIB + conf.name+'.zip', function(uploaded) {
-                if (uploaded != null) {
-                  var urlParams = {
-                    Bucket: consts.AWS_QRCODE_BUCKET,
-                    Key: uploaded
-                  };
-                  s3.getSignedUrl('getObject', urlParams, function(err, url) {
-                    console.log('the url of the image is ', url);
-                  })
-                  // deleteImage(conf.name+'.zip');
-                  // cb (uploaded, null);
-                  resolve(uploaded);
-                } else {
-                  console.log("could not upload to AWS");
-                  reject ("could not upload to AWS");
-                }
+          console.log("searching for " + conf.name + '.zip');
+          var params = {
+            Bucket: consts.AWS_QRCODE_BUCKET,
+            Key: conf.name + '.zip'
+          };
+          s3.headObject(params, function(err, metadata) {
+            if (err && err.code === 'NotFound') {
+              // Handle no object on cloud here
+              console.log("conf does not exist in S3, will create: " + conf);
+              var region = consts.AWS_REGION;
+              var bucket = consts.AWS_QRCODE_BUCKET;
+              var folder = '.';
+              var output = fs.createWriteStream(join(consts.QRCODELIB, conf.name + '.zip'));
+              var files = [];
+              conf.lectures.forEach(function(lct) {
+                files.push(lct.qr_code);
               });
-            });
-
+              console.log(files);
+              s3Zip
+                .archive({
+                  region: region,
+                  bucket: bucket
+                }, null, files)
+                .pipe(output)
+                .on('finish', function() {
+                  console.log("Created zip");
+                  uploadToS3(conf.name + '.zip', consts.QRCODELIB + conf.name + '.zip', function(uploaded) {
+                    if (uploaded != null) {
+                      resolve(uploaded.replace(" ", "%20"));
+                    } else {
+                      console.log("could not upload to AWS");
+                      reject("could not upload to AWS");
+                    }
+                  });
+                });
+            } else {
+              resolve(params.Key.replace(" ", "%20"));
+            }
+          });
         } else {
           console.log("did not find conf");
           reject("did not find conf");
         }
 
-        });
       });
-  };
+  });
+};

@@ -9,6 +9,26 @@ service.buildPath = buildPath;
 
 module.exports = service;
 
+function removeFromVisitorSchema(visitorId, confId, cb) {
+  let query = {
+    "_id": visitorId,
+    "confs.confId": confId
+  }
+  let doc = {
+    "$unset": {
+      "confs.$.custome_path": ""
+    }
+  }
+  VisitorScehma.update(query, doc, function(err, raw) {
+    if (err) {
+      console.log(err);
+      cb("Could not delete Path from visitor " + visitorId);
+    } else {
+      console.log("deleted old path from " + visitorId);
+    }
+  });
+}
+
 function addToVisitorSchema(build, visitorId, confId, cb) {
   var doc = {
     "$push": {
@@ -19,6 +39,7 @@ function addToVisitorSchema(build, visitorId, confId, cb) {
     "_id": visitorId,
     "confs.confId": confId
   }
+  removeFromVisitorSchema(visitorId, confId);
   VisitorScehma.update(query, doc, function(err, raw) {
     if (err) {
       console.log(err);

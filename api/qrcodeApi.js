@@ -89,7 +89,7 @@ function get_multiple_images(req, res) {
   qrcodeService.get_multiple_images(req.body.confId)
     .then(function(status) {
       res.status(200).json({
-        "zip uploaded": status
+        "zip": status
       });
     })
     .catch(function(err) {
