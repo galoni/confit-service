@@ -70,7 +70,7 @@ function buildProgram(confId) {
       }
       console.log(`sorted finish: ${JSON.stringify(sortProgram)}`);
       conf.visitors.forEach(function(visitorId) {
-        pathBuilder.buildPath(confId, visitorId);
+          pathBuilder.buildPath(confId, visitorId);
       });
       sortProgram.sort(function(a, b) {
           return a.dayNum - b.dayNum
@@ -79,3 +79,36 @@ function buildProgram(confId) {
     });
   });
 }
+//========Matching Percent=======
+
+// let totalMP = 0;
+// let divide = conf.visitors.length;
+// conf.visitors.forEach(function(visitorId) {
+//     let errorCheck = 100;
+//     // console.log("inside: visitorId " + JSON.stringify(visitorId));
+//     // pathBuilder.buildPath(confId, visitorId);
+//     sortProgram.forEach((sess)=>{
+//         let sessCheck = 0;
+//         // console.log("inside: sess " + JSON.stringify(sess));
+//         sess.lectures.forEach((lct) => {
+//             for(let i = 0; i < visitorId.preffered_lectures.length; i++){
+//                 // console.log("inside: " + visitorId.preffered_lectures[i]);
+//                 if (visitorId.preffered_lectures[i] === lct._id){
+//                     // console.log("found");
+//                     sessCheck++;
+//                 }
+//             }
+//         });
+//         console.log("sessCheck: " + sessCheck);
+//         if (sessCheck === 2){
+//             errorCheck = 50;
+//         }
+//         else if(sessCheck === 3){
+//             errorCheck = 0;
+//         }
+//     });
+//     totalMP += errorCheck;
+//     console.log("totalMP: " + totalMP);
+//     totalMP = 0;
+// });
+// console.log("MP: " + totalMP/divide);
