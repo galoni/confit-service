@@ -23,6 +23,9 @@ router.post('/addManyLectures', addManyLectures);
 router.post('/createProgram', createProgram);
 router.post('/getAllConfs', getAllConfs);
 router.post('/getAllLecturesByTopic', getAllLecturesByTopic);
+router.post('/getLectureById', getLectureById);
+
+
 
 // router.post('/login', login);
 // router.post('/register', register);
@@ -133,6 +136,22 @@ function getConfById(req, res){
             if (conf) {
                 console.log("confernce:" + conf);
                 res.send(conf);
+            } else {
+                res.sendStatus(404);
+            }
+        })
+        .catch(function (err) {
+            console.log("error:" + err);
+            res.status(400).send(err);
+        });
+}
+
+function getLectureById(req, res){
+    managerService.getLectureById(req.body.lectureId)
+        .then(function (lect) {
+            if (lect) {
+                console.log("lecture:" + lect);
+                res.send(lect);
             } else {
                 res.sendStatus(404);
             }

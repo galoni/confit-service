@@ -26,6 +26,7 @@ service.getAllConfs             = getAllConfs;
 service.addVisitorTocConf       = addVisitorTocConf;
 service.addPreffered_lectures   = addPreffered_lectures;
 service.getAllLecturesByTopic   = getAllLecturesByTopic;
+service.getLectureById          =getLectureById;
 
 
 module.exports = service;
@@ -314,7 +315,7 @@ function getConfById(confId){
 
 function getLectureById(lectureId){
   return new Promise((resolve, reject) => {
-    console.log("conf id: " + lectureId);
+    console.log("lect id: " + lectureId);
     lecture.findOne({_id: ObjectId(lectureId)},
         (err, lct) => {
           if(err) {
