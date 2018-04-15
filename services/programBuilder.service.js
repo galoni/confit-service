@@ -70,7 +70,7 @@ function buildProgram(confId) {
       }
       console.log(`sorted finish: ${JSON.stringify(sortProgram)}`);
       conf.visitors.forEach(function(visitorId) {
-          pathBuilder.buildPath(confId, visitorId);
+          pathBuilder.buildPath(confId, visitorId.visitorid);
       });
       sortProgram.sort(function(a, b) {
           return a.dayNum - b.dayNum
