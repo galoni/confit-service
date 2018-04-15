@@ -22,6 +22,7 @@ router.post('/getAllLectures', getAllLectures);
 router.post('/addManyLectures', addManyLectures);
 router.post('/createProgram', createProgram);
 router.post('/getAllConfs', getAllConfs);
+router.post('/getAllLecturesByTopic', getAllLecturesByTopic);
 
 // router.post('/login', login);
 // router.post('/register', register);
@@ -160,7 +161,7 @@ function addSessionToConf(req, res) {
 
 function addLectureToConf(req, res) {
   let lectureId   = req.body.lectureId;
-  let confId     = req.body.confId; 
+  let confId     = req.body.confId;
   managerService.addLectureToConf(lectureId, confId)
     .then(function(status) {
         res.status(200).json({"status": status});
@@ -183,6 +184,23 @@ function buildProgram(req, res) {
 
 function getAllLectures(req, res){
     managerService.getAllLectures()
+        .then(function (lectures) {
+            if (lectures) {
+                console.log("lectures:" + lectures);
+                res.send(lectures);
+            } else {
+                res.sendStatus(404);
+            }
+        })
+        .catch(function (err) {
+            console.log("error:" + err);
+            res.status(400).send(err);
+        });
+}
+
+function getAllLecturesByTopic(req, res){
+    let topics   = req.body.main_topics;
+    managerService.getAllLecturesByTopic(topics)
         .then(function (lectures) {
             if (lectures) {
                 console.log("lectures:" + lectures);

@@ -25,6 +25,7 @@ service.createProgram           = createProgram;
 service.getAllConfs             = getAllConfs;
 service.addVisitorTocConf       = addVisitorTocConf;
 service.addPreffered_lectures   = addPreffered_lectures;
+service.getAllLecturesByTopic   = getAllLecturesByTopic;
 
 
 module.exports = service;
@@ -170,7 +171,7 @@ function createConference(name, type, logo, start_date, duration, location, audi
                 }
                 doc = {
                   qr_code: qr_code
-                }
+                };
                 Conf.update({_id: cnf["_id"]}, doc, function(err, raw) {
                   if (err){
                     reject ("could not update qr_code")
@@ -178,7 +179,7 @@ function createConference(name, type, logo, start_date, duration, location, audi
                   else{
                     console.log("Added qr_code to "+ cnf["_id"]);
                   }
-                })
+                });
                 console.log("new conference: " + cnf);
                 resolve(cnf);
               })
@@ -225,18 +226,19 @@ function createLecture(name, lecturer_name, description, topic, ratings){
                 }
                 doc = {
                   qr_code: qr_code
-                }
+                };
                 lecture.update({_id: lct["_id"]}, doc, function(err, raw) {
                   if (err){
-                    reject ("could not update qr_code")
+                    reject ("could not update qr_code");
                   }
                   else{
                     console.log("Added qr_code to "+ lct["_id"]);
+                    lct.qr_code=qr_code;
+                    console.log("new lcture: " + lct);
+                    resolve(lct);
                   }
-                })
-                console.log("new lcture: " + lct);
-                resolve(lct);
-              })
+                });
+              });
 
             }
           })
@@ -508,6 +510,25 @@ function createProgram(confSessions, confId){
                     console.log(`createProgram STATUS: SUCCESS`);
                     resolve(obj);
                 }
+            });
+    });
+}
+
+function getAllLecturesByTopic(topics){
+    return new Promise((resolve, reject) => {
+        console.log("getAllLecturesByTopic " + topics);
+        lecture.find({topic: { $in: topics }}).exec(
+            (err, lct) => {
+                if(err) {
+                    console.log('getAllLecturesByTopic STATUS: FAILED');
+                    reject(err);
+                }
+                console.log('getAllLecturesByTopic STATUS: SUCCESS');
+                if(!lct) {
+                    console.log("info : No lectures probably not");
+                    return resolve("info : No lectures probably not");
+                }
+                resolve(lct);
             });
     });
 }
