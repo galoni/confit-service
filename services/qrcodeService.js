@@ -168,6 +168,7 @@ function get_multiple_images(confId) {
               var folder = '.';
               var output = fs.createWriteStream(join(consts.QRCODELIB, conf.name + '.zip'));
               var files = [];
+              files.push(conf.qr_code);
               conf.lectures.forEach(function(lct) {
                 files.push(lct.qr_code);
               });
@@ -182,6 +183,7 @@ function get_multiple_images(confId) {
                   console.log("Created zip");
                   uploadToS3(conf.name + '.zip', consts.QRCODELIB + conf.name + '.zip', function(uploaded) {
                     if (uploaded != null) {
+                      deleteImage(uploaded);
                       resolve(uploaded.replace(" ", "%20"));
                     } else {
                       console.log("could not upload to AWS");
