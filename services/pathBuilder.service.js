@@ -158,12 +158,12 @@ function buildPath(confId, visitorId) {
                 return element["confId"] == conf["_id"];
               });
               console.log(profile);
-              console.log("learn: " + profile["learn_precent"]);
+              console.log("learn: " + profile["learn_percent"]);
               console.log("length: " + conf["program"].length);
               var elc_modes = {
-                learn: profile["learn_precent"] * conf["program"].length,
-                explore: profile["explore_precent"] * conf["program"].length,
-                connect: profile["connection_precent"] * conf["program"].length,
+                learn: profile["learn_percent"] * conf["program"].length,
+                explore: profile["explore_percent"] * conf["program"].length,
+                connect: profile["connection_percent"] * conf["program"].length,
               }
 
             } else {
