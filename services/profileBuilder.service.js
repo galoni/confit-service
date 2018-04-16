@@ -18,6 +18,7 @@ service.updatePreffered_lectures=updatePreffered_lectures;
 service.setTopics=setTopics;
 service.appendTopic=appendTopic;
 service.appendPrefferedLecture=appendPrefferedLecture;
+service.updatePercent=updatePercent;
 
 //service.matching=matching;
 
@@ -102,7 +103,7 @@ function createVisitor(first_name,last_name, linkdin, education, occupation){
   });
 }
 
-function registerToConf
+/*function registerToConf
 (visitorid, confid,confname,connection_precent,learn_precent,explore_precent) {
   console.log("Trace: registerToConf("+confid+") by visitor: ("+visitorid+")");
     var all=parseInt(connection_precent)+parseInt(learn_precent)+parseInt(explore_precent);
@@ -120,6 +121,52 @@ function registerToConf
                "explore_precent":explore_precent,
                "learn_precent":learn_precent,
                "profile_pie":profilePie,
+               "preffered_lectures":[]})
+      return new Promise((resolve, reject) => {
+      let visitor = getVisitorById(visitorid).then((visitor) => {
+          console.log(visitor);
+        for(let pIndex = 0; pIndex < visitor.confs.length; pIndex++) {
+          if(visitor.confs[pIndex].confId === confid) {
+            console.log(`found conf: ${visitor.confs[pIndex].confId}`);
+            reject("failed - conf exist in the confs array");
+            return;
+          }
+        }
+        visitor.confs.push(confs[0]);
+        visitor.save((err) => {
+          if(err){
+            console.log(`err: ${err}`);
+            resolve(false);
+          }
+          else{
+            console.log(`Saved document: ${visitor._id}`);
+            managerService.addVisitorTocConf(visitorid,confid);
+
+            resolve(true);
+          }
+        });
+      })
+  });
+}*/
+
+function registerToConf
+(visitorid, confid,confname) {
+  console.log("Trace: registerToConf("+confid+") by visitor: ("+visitorid+")");
+    //var all=parseInt(connection_precent)+parseInt(learn_precent)+parseInt(explore_precent);
+    //console.log("all=" + all);
+    //connection_precent=parseInt(connection_precent)/all;
+    //learn_precent=parseInt(learn_precent)/all;
+    //explore_precent=parseInt(explore_precent)/all;
+    //console.log("precent " + connection_precent);
+    //var profilePie=connection_precent*0.001
+    //+explore_precent*0.01+learn_precent*0.1;
+    var confs=[];
+    confs.push({"confId":confid,
+                "confname":confname,
+               //"connection_precent":connection_precent,
+               //"explore_precent":explore_precent,
+               //"learn_precent":learn_precent,
+               "profile_pie":0,
                "preffered_lectures":[]})
       return new Promise((resolve, reject) => {
       let visitor = getVisitorById(visitorid).then((visitor) => {
@@ -219,45 +266,46 @@ function updateProfilePie(visitorid,confid ,lecture1,lecture2,lecture3) {
                   this.topicOn=this.confOn.lectures[i].topic;
                   //console.log(this.topicOn);
                   var index = this.topics.indexOf(this.topicOn);
-                  //console.log(index);
+                  console.log(index);
                   //console.log("this.value_topics[index]="+value_topics[index]);
                   //console.log("value_topics_index[index]="+value_topics_index[index]);
                   profile_pie_topics=profile_pie_topics+value_topics[index]*value_topics_index[index];
-                  console.log("profilePie= "+profile_pie_topics);
+                  console.log("profile_pie_topics= "+profile_pie_topics);
                 }
                 else if(this.confOn.lectures[i]._id===lecture2){
                   this.topicOn=this.confOn.lectures[i].topic;
                   //console.log(this.topicOn);
                   var index = this.topics.indexOf(this.topicOn);
-                  //console.log(index);
+                  console.log(index);
                   //console.log("this.value_topics[index]="+value_topics[index]);
                   //console.log("value_topics_index[index]="+value_topics_index[index]);
                   profile_pie_topics=profile_pie_topics+value_topics[index]*value_topics_index[index];
-                  console.log("profilePie= "+profile_pie_topics);
+                  console.log("profile_pie_topics= "+profile_pie_topics);
                 }
                 else if(this.confOn.lectures[i]._id===lecture3){
                   this.topicOn=this.confOn.lectures[i].topic;
                   //console.log(this.topicOn);
                   var index = this.topics.indexOf(this.topicOn);
-                  //console.log(index);
+                  console.log(index);
                   //console.log("this.value_topics[index]="+value_topics[index]);
                   //console.log("value_topics_index[index]="+value_topics_index[index]);
                   profile_pie_topics=profile_pie_topics+value_topics[index]*value_topics_index[index];
-                  console.log("profilePie= "+profile_pie_topics);
+                  console.log("profile_pie_topics= "+profile_pie_topics);
                 }
               }
-              //console.log(this.visitorOn.confs.length);
-              //console.log(this.confOn._id);
-              for(let i=0;i<this.visitorOn.confs.length;i++){
-                if(JSON.stringify(this.confOn._id)===JSON.stringify(this.visitorOn.confs[i].confId)){
-                  profilePieExist=this.visitorOn.confs[i].profile_pie;
-                  console.log(profilePieExist);
-                }
-              }
-              console.log(profile_pie_topics);
-              profilePieExist=profilePieExist*0.6+profile_pie_topics*0.4;
 
-              console.log(profilePieExist);
+              //for(let i=0;i<this.visitorOn.confs.length;i++){
+                //if(JSON.stringify(this.confOn._id)===JSON.stringify(this.visitorOn.confs[i].confId)){
+                  //profilePieExist=this.visitorOn.confs[i].profile_pie;
+                  //console.log(profilePieExist);
+                //}
+              //}
+              console.log("profile_pie_topics="+profile_pie_topics);
+              //profilePieExist=profilePieExist*0.6+profile_pie_topics*0.4;
+              profile_pie_topics=profile_pie_topics*0.4;
+              console.log("profile_pie_topics after * 0.4="+profile_pie_topics);
+
+              //console.log(profilePieExist);
               Visitor.update(
               {
                   "_id" :visitorid,
@@ -265,7 +313,7 @@ function updateProfilePie(visitorid,confid ,lecture1,lecture2,lecture3) {
               },
               {
                   "$set": {
-                      "confs.$.profile_pie": profilePieExist
+                      "confs.$.profile_pie": profile_pie_topics
                   }
               },
               function(err, doc) {
@@ -329,8 +377,7 @@ function appendPrefferedLecture(visitorid,confid, lecture){
     });
 }
 
-function updatePreffered_lectures
-(visitorid,confid, lecture1,lecture2,lecture3) {
+function updatePreffered_lectures(visitorid,confid, lecture1,lecture2,lecture3) {
   console.log("Trace: updatePreffered_lectures("+visitorid+") To conference id ("+confid+")");
     var preffered_lectures=[];
     preffered_lectures.push(lecture1);
@@ -360,38 +407,83 @@ function updatePreffered_lectures
         }
     });
     });
+  }
+
+    function updatePercent(visitorid,confid, connection_percent,learn_percent,explore_percent) {
+      var profile_pie_exist;
+      var confon;
+      var visitorOn;
+      console.log("Trace: updatePercent("+visitorid+") To conference id ("+confid+")");
+      var all=parseInt(connection_percent)+parseInt(learn_percent)+parseInt(explore_percent);
+      console.log("all=" + all);
+      connection_percent=parseInt(connection_percent)/all;
+      learn_percent=parseInt(learn_percent)/all;
+      explore_percent=parseInt(explore_percent)/all;
+      //console.log("precent " + connection_percent);
+      var profilePie=connection_percent*0.001
+      +explore_percent*0.01+learn_percent*0.1;
+      profilePie=profilePie*0.6;
+      console.log("profilePie *0.6="+profilePie);
+      return new Promise((resolve, reject) => {
+
+      Visitor.findOne({_id: ObjectId(visitorid)},
+          (err, visitor) => {
+            if(err) {
+              console.log('getVisitorById STATUS: FAILED');
+              //reject(err);
+            }
+            console.log('getVisitorById STATUS: SUCCESS');
+            if(!visitor) {
+              console.log("info : wrong visitor id");
+              //return resolve("error : wrong visitor id");
+            }
+            this.visitorOn=visitor;
+            //console.log("visitoron="+JSON.stringify(this.visitorOn));
+            console.log("confid="+confid);
+            for(let i=0;i<this.visitorOn.confs.length;i++){
+
+              if(this.visitorOn.confs[i].confId===confid){
+                //console.log("this.visitorOn.confs[i].confId="+this.visitorOn.confs[i].confId);
+                //console.log("this.visitorOn.confs[i].profile_pie="+this.visitorOn.confs[i].profile_pie);
+                profile_pie_exist=this.visitorOn.confs[i].profile_pie;
+                //console.log("profile_pie_exist="+profile_pie_exist);
+                console.log("found cofID, update profile_pie_exist to:"+profile_pie_exist);
+                profile_pie_exist=profile_pie_exist+profilePie;
+                console.log("summerize profile_pie, update profile_pie to:"+profile_pie_exist);
+                console.log("this profile_pie_exist="+profile_pie_exist);
+              Visitor.update(
+              {
+                  "_id" :visitorid,
+                  "confs.confId": confid
+              },
+              {
+                  "$set": {
+                    "confs.$.connection_percent":connection_percent,
+                    "confs.$.learn_percent":learn_percent,
+                    "confs.$.explore_percent":explore_percent,
+
+                      "confs.$.profile_pie": profile_pie_exist
+                  }
+              },
+              function(err, doc) {
+                  if(err){
+                  console.log(err);
+                      reject({"error": err});
+                  }else{
+                  console.log("success "+visitorid+" updated");
+                      //managerService.addPreffered_lectures(visitorid,confid,preffered_lectures);
+                      //updateProfilePie(visitorid,confid,lecture1,lecture2,lecture3);
+                      //managerService.addRating(lecture1,lecture2,lecture3);
+                      resolve(true);
+                  }
+              });
+              }
+              }
+            });
+          });
+//console.log("this profile_pie_exist="+profile_pie_exist);
 
 
-      /*return new Promise((resolve, reject) => {
-      var flag=false;
-      let visitor = getVisitorById(visitorid).then((visitor) => {
-        for(let pIndex = 0; pIndex < visitor.confs.length; pIndex++) {
-          if(visitor.confs[pIndex].confId === confid) {
-            //console.log(`found conf: ${visitor.confs[pIndex].confId}`);
-            //reject("failed - conf exist in the confs array");
-            //return;
-            flag=true;
-            visitor.confs[pIndex].preffered_lectures.push({"preffered_lectures":preffered_lectures});
-          }
-        }
-        if(flag){
-          visitor.save((err) => {
-          if(err){
-            console.log(`err: ${err}`);
-            resolve(false);
-          }
-          else{
-            console.log(`Saved document: ${visitor._id}`);
-            resolve(true);
-          }
-        });
-        }
-        else{
-            reject("failed - conf not exist in the confs array");
-            return;
-        }
-      })
-  });*/
 }
 
 function appendTopic(visitorid, confid, topic){

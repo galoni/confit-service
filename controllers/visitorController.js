@@ -17,6 +17,7 @@ router.post('/buildPath', buildPath);
 router.post('/getVisitorById', getVisitorById);
 router.post('/setTopics', setTopics);
 router.post('/appendTopic', appendTopic);
+router.post('/updatePercent', updatePercent);
 
 module.exports = router;
 
@@ -62,8 +63,18 @@ function createVisitor(req, res) {
       });
 }
 
+function updatePercent(req, res) {
+  visitorService.updatePercent(req.body.visitorid, req.body.confid,req.body.connection_precent,req.body.learn_precent,req.body.explore_precent)
+      .then(function(status) {
+          res.status(200).json({"status": status});
+      })
+      .catch(function (err) {
+          res.status(400).send(err);
+      });
+}
+
 function registerToConf(req, res) {
-  visitorService.registerToConf(req.body.visitorid, req.body.confid,req.body.confname,req.body.connection_precent,req.body.learn_precent,req.body.explore_precent)
+  visitorService.registerToConf(req.body.visitorid, req.body.confid,req.body.confname)
       .then(function(status) {
           res.status(200).json({"status": status});
       })
