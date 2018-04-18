@@ -3,11 +3,10 @@ var uuid = require('node-uuid');
 const fs = require('fs');
 const consts = require('../consts');
 var AWS = require('aws-sdk');
-var credentials = new AWS.SharedIniFileCredentials({
-  profile: 'confit'
+var s3 = new AWS.S3({
+  accessKeyId: process.env.S3_KEY,
+  secretAccessKey: process.env.S3_SECRET
 });
-AWS.config.credentials = credentials;
-var s3 = new AWS.S3();
 var join = require('path').join;
 var s3Zip = require('s3-zip');
 

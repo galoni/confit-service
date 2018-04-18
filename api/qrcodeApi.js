@@ -3,9 +3,10 @@ var router = express.Router();
 var qrcodeService = require('../services/qrcodeService');
 var consts = require('../consts.js');
 var AWS = require('aws-sdk');
-var credentials = new AWS.SharedIniFileCredentials({profile: 'confit'});
-AWS.config.credentials = credentials;
-var s3 = new AWS.S3();
+var s3 = new AWS.S3({
+  accessKeyId: process.env.S3_KEY,
+  secretAccessKey: process.env.S3_SECRET
+});
 var fs = require('fs')
 var join = require('path').join
 var s3Zip = require('s3-zip')
