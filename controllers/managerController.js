@@ -7,7 +7,7 @@ const Manager = require('../models/managerSchema');
 const consts = require('../consts.js');
 
 // routes
-// router.post('/createConference', createConference);
+router.post('/createManager', createManager);
 router.post('/createSession', createSession);
 router.post('/getConfSessionByName', getConfSessionByName);
 router.post('/getConfById', getConfById);
@@ -24,7 +24,8 @@ router.post('/createProgram', createProgram);
 router.post('/getAllConfs', getAllConfs);
 router.post('/getAllLecturesByTopic', getAllLecturesByTopic);
 router.post('/getLectureById', getLectureById);
-
+router.post('/getManagerById', getManagerById);
+router.post('/getAllConfById', getAllConfById);
 
 
 // router.post('/login', login);
@@ -43,6 +44,16 @@ router.post('/getLectureById', getLectureById);
 // });
 
 module.exports = router;
+
+function createManager(req, res) {
+    managerService.createManager(req.body.first_name, req.body.last_name,req.body.linkdin,req.body.education,req.body.occupation)
+        .then(function(status) {
+            res.status(200).json({"status": status});
+        })
+        .catch(function (err) {
+            res.status(400).send(err);
+        });
+}
 
 function createSession(req, res) {
   managerService.createSession(req.body.name, req.body.session_type, req.body.duration)
@@ -136,6 +147,39 @@ function getConfById(req, res){
             if (conf) {
                 console.log("confernce:" + conf);
                 res.send(conf);
+            } else {
+                res.sendStatus(404);
+            }
+        })
+        .catch(function (err) {
+            console.log("error:" + err);
+            res.status(400).send(err);
+        });
+}
+
+function getManagerById(req, res){
+    managerService.getManagerById(req.body.managerId)
+        .then(function (manager) {
+            if (manager) {
+                console.log("manager:" + manager);
+                res.send(manager);
+            } else {
+                res.sendStatus(404);
+            }
+        })
+        .catch(function (err) {
+            console.log("error:" + err);
+            res.status(400).send(err);
+        });
+}
+
+function getAllConfById(req, res){
+    managerService.getAllConfById(req.body.managerId)
+        .then(function (confs) {
+            if (confs) {
+                console.log("done");
+                // console.log("confs:" + confs);
+                res.send(confs);
             } else {
                 res.sendStatus(404);
             }

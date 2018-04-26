@@ -26,10 +26,49 @@ service.getAllConfs             = getAllConfs;
 service.addVisitorTocConf       = addVisitorTocConf;
 service.addPreffered_lectures   = addPreffered_lectures;
 service.getAllLecturesByTopic   = getAllLecturesByTopic;
-service.getLectureById          =getLectureById;
-
+service.getLectureById          = getLectureById;
+service.createManager           = createManager;
+service.getManagerById          = getManagerById;
+service.getAllConfById          = getAllConfById;
 
 module.exports = service;
+
+function createManager(first_name,last_name, linkdin, education, occupation){
+    return new Promise((resolve, reject) => {
+        Manager.findOne({linkdin : linkdin},
+            (err, manager) => {
+                if (err){
+                    console.log("error: " + err);
+                    reject("error");
+                }
+                if(manager) {
+                    console.log("info : exist linkdin profile");
+                    return resolve("info : exist linkdin profile");
+                }
+                else{
+                    console.log('Trace: createManager('+first_name+','+last_name+')');
+                    let newManager = new Manager({
+                        name :{first_name:first_name,last_name:last_name},
+                        linkedin : linkdin,
+                        education : education,
+                        occupation : occupation,
+                    });
+                    console.log('createManager STATUS: SUCCESS ' + first_name);
+                    newManager.save((err, manager) => {
+                        if (err){
+                            console.log("error: " + err);
+                            reject("error");
+                        }
+                        else{
+                            console.log("new manager: " + manager);
+                            resolve(manager);
+                        }
+                    });
+                }
+            })
+    });
+}
+
 
 function addVisitorTocConf(visitorid, confid){
   var visitor=[];
@@ -311,6 +350,53 @@ function getConfById(confId){
           resolve(conf);
         });
   });
+}
+
+function getManagerById(managerId){
+    return new Promise((resolve, reject) => {
+        console.log("conf id: " + managerId);
+        Manager.findOne({_id: ObjectId(managerId)},
+            (err, manager) => {
+                if(err) {
+                    console.log('getManagerById STATUS: FAILED');
+                    reject(err);
+                }
+                console.log('getManagerById STATUS: SUCCESS');
+                if(!manager) {
+                    console.log("info : wrong manager id");
+                    return resolve("error : wrong manager id");
+                }
+                resolve(manager);
+            });
+    });
+}
+
+function getAllConfById(managerId) {
+    return new Promise((resolve, reject) => {
+        let manager = getManagerById(managerId).then((manager) =>{
+            if(manager.confs.length === 0){
+                console.log("no confs");
+                reject("no confs");
+            }
+            setAllConfs(manager).then((confs)=>{
+                // console.log("my confs: " + confs);
+                resolve(confs);
+            });
+        });
+    });
+}
+
+function setAllConfs(manager){
+    return new Promise((resolve, reject) =>{
+        let confs = [];
+        manager.confs.forEach((conf, index, array) =>{
+            getConfById(conf.confId).then((cnf) =>{
+                confs.push(cnf);
+                console.log("cnf name: " +cnf.name);
+                if (index === array.length -1) resolve(confs);
+            })
+        })
+    });
 }
 
 function getLectureById(lectureId){
