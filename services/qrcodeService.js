@@ -106,9 +106,6 @@ function createImage(id, data, type, cb) {
           Bucket: consts.AWS_QRCODE_BUCKET,
           Key: uploaded
         };
-        s3.getSignedUrl('getObject', urlParams, function(err, url) {
-          console.log('the url of the image is ', url);
-        })
         deleteImage(uploaded);
         cb(uploaded, null);
       } else {
