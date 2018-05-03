@@ -105,7 +105,7 @@ function appendTopic(req, res) {
 }
 
 function setTopics(req, res) {
-  visitorService.setTopics(req.body.visitorid, req.body.confid,req.body.topic1,req.body.topic2,req.body.topic3)
+  visitorService.setTopics(req.body.visitorid, req.body.confid,req.body.topic1)
       .then(function(status) {
           res.status(200).json({"status": status});
       })

@@ -511,13 +511,11 @@ function appendTopic(visitorid, confid, topic){
     });
 }
 
-function setTopics
-(visitorid,confid, topic1,topic2,topic3) {
+function setTopics(visitorid,confid, topic1) {
   console.log("Trace: setTopics("+visitorid+") To conference id ("+confid+")");
     var mainTopic=[];
     mainTopic.push(topic1);
-    mainTopic.push(topic2);
-    mainTopic.push(topic3);
+
     return new Promise((resolve, reject) => {
     Visitor.update(
     {
