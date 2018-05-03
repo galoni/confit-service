@@ -378,16 +378,44 @@ function getAllConfById(managerId) {
                 console.log("no confs");
                 reject("no confs");
             }
-            setAllConfs(manager).then((confs)=>{
-                // console.log("my confs: " + confs);
+            let confObjectId = [];
+            manager.confs.forEach((cnf) => {
+               confObjectId.push(ObjectId(cnf.confId));
+            });
+            console.log("object id array: " + confObjectId);
+            getAllConfByArray(confObjectId).then((confs) =>{
+                console.log("confs");
                 resolve(confs);
             });
+            // setAllConfs(manager).then((confs)=>{
+            //     // console.log("my confs: " + confs);
+            //     resolve(confs);
+            // });
         });
+    });
+}
+
+function getAllConfByArray(confObjectId) {
+    return new Promise((resolve, reject) => {
+        Conf.find({'_id' : {$in: confObjectId}},
+            (err, confs) => {
+                if(err) {
+                    console.log('getAllConfs STATUS: FAILED');
+                    reject(err);
+                }
+                console.log('getAllConfs STATUS: SUCCESS');
+                if(!confs) {
+                    console.log("info : No confs probably not");
+                    return resolve("info : No confs probably not");
+                }
+                resolve(confs);
+            });
     });
 }
 
 function setAllConfs(manager){
     return new Promise((resolve, reject) =>{
+    // let actions = items.map(fn);
         let confs = [];
         manager.confs.forEach((conf, index, array) =>{
             getConfById(conf.confId).then((cnf) =>{
