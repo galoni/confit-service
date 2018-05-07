@@ -75,8 +75,9 @@ function createConference(req, res) {
   let location      = req.body.location;
   let audience      = req.body.audience;
   let main_topics   = req.body.main_topics;
+  let managerId     = req.body.managerId;
   console.log("data: " +main_topics);
-  managerService.createConference(name, type, logo, start_date, duration, location, audience, main_topics)
+  managerService.createConference(name, type, logo, start_date, duration, location, audience, main_topics, managerId)
       .then(function(status) {
           res.status(200).json(status);
       })

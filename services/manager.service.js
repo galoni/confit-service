@@ -172,7 +172,7 @@ function addRating(lecture1,confid){
 //   });
 // }
 
-function createConference(name, type, logo, start_date, duration, location, audience, main_topics){
+function createConference(name, type, logo, start_date, duration, location, audience, main_topics, managerId){
   return new Promise((resolve, reject) => {
     Conf.findOne({name : name},
       (err, cnf) => {
@@ -221,6 +221,7 @@ function createConference(name, type, logo, start_date, duration, location, audi
                   }
                 });
                 console.log("new conference: " + cnf);
+                addConfToManager(managerId, cnf._id);
                 resolve(cnf);
               })
 
@@ -594,19 +595,6 @@ function addManyLectures(confLectures, confId){
                     resolve(conf);
                 }
             })
-        // let conditions = {_id: ObjectId(confId)},
-        //     update = {"lectures" : confLectures},
-        //     opts = {new:true};
-        // Conf.update(conditions, update, opts,
-        //     (err, obj) => {
-        //         if(err) {
-        //             reject({"error": err});
-        //             console.log('addManyLectures STATUS: FAILED' + err);
-        //         } else{
-        //             console.log(`addManyLectures STATUS: SUCCESS`);
-        //             resolve(obj);
-        //         }
-        //     });
     });
 }
 
@@ -646,6 +634,24 @@ function getAllLecturesByTopic(topics){
                 resolve(lct);
             });
     });
+}
+
+function addConfToManager(managerId, confId){
+  var conf=[];
+  conf.push({"confId":confId,"confname":'test'});
+
+  console.log('Trace: addConfToManager('+managerId+','+confId+')');
+    Manager.findByIdAndUpdate(managerId,
+    {$push: {confs: conf}},
+    {safe: true, upsert: true},
+    function(err, doc) {
+        if(err){
+        console.log(err);
+        }else{
+        console.log("success "+confId+" updated");
+        }
+    }
+);
 }
 
 function addNewPlaylist(userId, playlistName){
