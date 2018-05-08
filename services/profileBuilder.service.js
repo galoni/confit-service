@@ -43,7 +43,6 @@ function matchingPeople(visitorid,confid){
               console.log("profilePie on conf found="+profilePie);
             }
           }
-              { price: { $not: { $gt: 1.99 } } }
               Visitor.aggregate([
                 { $unwind :'$confs'},
                 {$match: {
