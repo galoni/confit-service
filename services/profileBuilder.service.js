@@ -26,27 +26,6 @@ module.exports = service;
 
 
 function matchingPeople(visitorid,confid){
-
-  /*Visitor.aggregate([
-  { $match: {"confs.confId":confid}},
-   {
-      $project: {
-         confs: {
-            $filter: {
-               input: "$confs",
-               as: "conf",
-              cond:{"$and": [
-               { "confId": confid },
-               { "$gte": [ "$profile_pie", 0.9 ] }
-           ]},
-         }
-      }
-   }
- }], function(err, result) {
-      console.log(result);
-});*/
-
-
   var visitors=[];
   var profilePie;
 
@@ -64,16 +43,6 @@ function matchingPeople(visitorid,confid){
               console.log("profilePie on conf found="+profilePie);
             }
           }
-          /*Visitor.find({"confs.confId":confid },
-              (err, visitors) => {
-                if(err) {
-                  console.log('getVisitorById STATUS: FAILED');
-                  reject(err);
-                }
-                console.log('matchingPeople-getVisitorById STATUS: SUCCESS');
-                //console.log(visitors);
-                console.log("LENGTH:"+visitors.length);
-              });*/
               { price: { $not: { $gt: 1.99 } } }
               Visitor.aggregate([
                 { $unwind :'$confs'},
@@ -83,7 +52,6 @@ function matchingPeople(visitorid,confid){
                           {'confs.profile_pie': {$gt:profilePie-0.003, $lt:profilePie+0.003}}
                       ]
                  }},
-                //{ $match : {'confs.confId': confid }},
                 { $project : {matching:null,visitorfirstname:"$name.first_name",visitorlastname:"$name.last_name" ,confId : '$confs.confId', confName : '$confs.confname', profilePie : '$confs.profile_pie' } }
                 ], function(err, result) {
                   if(err){console.log("error in aggregate");}
