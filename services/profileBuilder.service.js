@@ -9,7 +9,6 @@ const managerService = require('./manager.service');
 
 var service = {};
 
-//service.buildPie= buildPie;
 service.createVisitor=createVisitor;
 service.registerToConf=registerToConf;
 service.getVisitorById=getVisitorById;
@@ -19,34 +18,92 @@ service.setTopics=setTopics;
 service.appendTopic=appendTopic;
 service.appendPrefferedLecture=appendPrefferedLecture;
 service.updatePercent=updatePercent;
+service.matchingPeople=matchingPeople;
 
-//service.matching=matching;
-
-//service.getPie=getPie;
 
 module.exports = service;
 
-/*function matching(visitorid,confid){
-    let matching_people=[];
-}*/
-/*function getPie(visitorid){
+
+
+function matchingPeople(visitorid,confid){
+
+  /*Visitor.aggregate([
+  { $match: {"confs.confId":confid}},
+   {
+      $project: {
+         confs: {
+            $filter: {
+               input: "$confs",
+               as: "conf",
+              cond:{"$and": [
+               { "confId": confid },
+               { "$gte": [ "$profile_pie", 0.9 ] }
+           ]},
+         }
+      }
+   }
+ }], function(err, result) {
+      console.log(result);
+});*/
+
+
+  var visitors=[];
+  var profilePie;
+
   return new Promise((resolve, reject) => {
-    console.log("visitor id: " + visitorid);
     Visitor.findOne({_id: ObjectId(visitorid)},
         (err, visitor) => {
           if(err) {
-            console.log('getPie STATUS: FAILED');
+            console.log('getVisitorById STATUS: FAILED');
             reject(err);
           }
-          console.log('getPie STATUS: SUCCESS');
-          if(!pie) {
-            console.log("info : wrong visitor id");
-            return resolve("info : wrong visitor id");
+          console.log('matchingPeople-getVisitorById STATUS: SUCCESS');
+          for(let i=0;i<visitor.confs.length;i++){
+            if(visitor.confs[i].confId===confid){
+              profilePie=visitor.confs[i].profile_pie;
+              console.log("profilePie on conf found="+profilePie);
+            }
           }
-          resolve(visitor.profile_pie);
+          /*Visitor.find({"confs.confId":confid },
+              (err, visitors) => {
+                if(err) {
+                  console.log('getVisitorById STATUS: FAILED');
+                  reject(err);
+                }
+                console.log('matchingPeople-getVisitorById STATUS: SUCCESS');
+                //console.log(visitors);
+                console.log("LENGTH:"+visitors.length);
+              });*/
+              { price: { $not: { $gt: 1.99 } } }
+              Visitor.aggregate([
+                { $unwind :'$confs'},
+                {$match: {
+                      $and: [
+                          {'confs.confId': confid },
+                          {'confs.profile_pie': {$gt:profilePie-0.003, $lt:profilePie+0.003}}
+                      ]
+                 }},
+                //{ $match : {'confs.confId': confid }},
+                { $project : {matching:null,visitorfirstname:"$name.first_name",visitorlastname:"$name.last_name" ,confId : '$confs.confId', confName : '$confs.confname', profilePie : '$confs.profile_pie' } }
+                ], function(err, result) {
+                  if(err){console.log("error in aggregate");}
+                  else{
+                     //console.log(result);
+                     visitors=result;
+                     //console.log(visitors);
+                     for (let j=0;j<visitors.length;j++){
+                       var min=Math.min(profilePie,visitors[j].profilePie);
+                       var max=Math.max(profilePie,visitors[j].profilePie)
+                       var result=Math.floor((min/max)*100);
+                       visitors[j].matching=result;
+                     }
+                    resolve(visitors)
+                   }
+               });
+          });
         });
-  });
-}*/
+}
+
 
 function createVisitor(first_name,last_name, linkdin, education, occupation){
   return new Promise((resolve, reject) => {
@@ -103,69 +160,15 @@ function createVisitor(first_name,last_name, linkdin, education, occupation){
   });
 }
 
-/*function registerToConf
-(visitorid, confid,confname,connection_precent,learn_precent,explore_precent) {
-  console.log("Trace: registerToConf("+confid+") by visitor: ("+visitorid+")");
-    var all=parseInt(connection_precent)+parseInt(learn_precent)+parseInt(explore_precent);
-    console.log("all=" + all);
-    connection_precent=parseInt(connection_precent)/all;
-    learn_precent=parseInt(learn_precent)/all;
-    explore_precent=parseInt(explore_precent)/all;
-    console.log("precent " + connection_precent);
-    var profilePie=connection_precent*0.001
-    +explore_precent*0.01+learn_precent*0.1;
-    var confs=[];
-    confs.push({"confId":confid,
-                "confname":confname,
-               "connection_precent":connection_precent,
-               "explore_precent":explore_precent,
-               "learn_precent":learn_precent,
-               "profile_pie":profilePie,
-               "preffered_lectures":[]})
-      return new Promise((resolve, reject) => {
-      let visitor = getVisitorById(visitorid).then((visitor) => {
-          console.log(visitor);
-        for(let pIndex = 0; pIndex < visitor.confs.length; pIndex++) {
-          if(visitor.confs[pIndex].confId === confid) {
-            console.log(`found conf: ${visitor.confs[pIndex].confId}`);
-            reject("failed - conf exist in the confs array");
-            return;
-          }
-        }
-        visitor.confs.push(confs[0]);
-        visitor.save((err) => {
-          if(err){
-            console.log(`err: ${err}`);
-            resolve(false);
-          }
-          else{
-            console.log(`Saved document: ${visitor._id}`);
-            managerService.addVisitorTocConf(visitorid,confid);
 
-            resolve(true);
-          }
-        });
-      })
-  });
-}*/
 
 function registerToConf
 (visitorid, confid,confname) {
   console.log("Trace: registerToConf("+confid+") by visitor: ("+visitorid+")");
-    //var all=parseInt(connection_precent)+parseInt(learn_precent)+parseInt(explore_precent);
-    //console.log("all=" + all);
-    //connection_precent=parseInt(connection_precent)/all;
-    //learn_precent=parseInt(learn_precent)/all;
-    //explore_precent=parseInt(explore_precent)/all;
-    //console.log("precent " + connection_precent);
-    //var profilePie=connection_precent*0.001
-    //+explore_precent*0.01+learn_precent*0.1;
+
     var confs=[];
     confs.push({"confId":confid,
                 "confname":confname,
-               //"connection_precent":connection_precent,
-               //"explore_precent":explore_precent,
-               //"learn_precent":learn_precent,
                "profile_pie":0,
                "preffered_lectures":[]})
       return new Promise((resolve, reject) => {
@@ -244,7 +247,7 @@ function updateProfilePie(visitorid,confid ,lecture1,lecture2,lecture3) {
                 console.log('confFindOne STATUS: FAILED');
               }
               console.log('confFindOne STATUS: SUCCESS');
-              if(!visitor) {
+              if(!conf) {
                 console.log("info : wrong conf id");
                 return resolve("error : wrong conf id");
               }
@@ -255,20 +258,13 @@ function updateProfilePie(visitorid,confid ,lecture1,lecture2,lecture3) {
               this.numoflectures=this.confOn.lectures.length;
               this.topics=this.confOn.main_topics;
               console.log(this.topics);
-              /*for(let i=0;i<this.numoflectures;i++){
-                console.log("this.lecturesOn[i]._id :"+ this.lecturesOn[i]._id);
-                lecturesID.push(JSON.stringify(this.lecturesOn[i]._id));
-                //console.log("this.lecturesOn[i]._id :"+ this.lecturesOn[i]._id);
-              }
-              console.log(lecturesID);*/
               for(let i=0;i<this.numoflectures;i++){
                 if(this.confOn.lectures[i]._id===lecture1){
                   this.topicOn=this.confOn.lectures[i].topic;
-                  //console.log(this.topicOn);
+
                   var index = this.topics.indexOf(this.topicOn);
                   console.log(index);
-                  //console.log("this.value_topics[index]="+value_topics[index]);
-                  //console.log("value_topics_index[index]="+value_topics_index[index]);
+
                   profile_pie_topics=profile_pie_topics+value_topics[index]*value_topics_index[index];
                   console.log("profile_pie_topics= "+profile_pie_topics);
                 }
@@ -277,35 +273,23 @@ function updateProfilePie(visitorid,confid ,lecture1,lecture2,lecture3) {
                   //console.log(this.topicOn);
                   var index = this.topics.indexOf(this.topicOn);
                   console.log(index);
-                  //console.log("this.value_topics[index]="+value_topics[index]);
-                  //console.log("value_topics_index[index]="+value_topics_index[index]);
+
                   profile_pie_topics=profile_pie_topics+value_topics[index]*value_topics_index[index];
                   console.log("profile_pie_topics= "+profile_pie_topics);
                 }
                 else if(this.confOn.lectures[i]._id===lecture3){
                   this.topicOn=this.confOn.lectures[i].topic;
-                  //console.log(this.topicOn);
                   var index = this.topics.indexOf(this.topicOn);
                   console.log(index);
-                  //console.log("this.value_topics[index]="+value_topics[index]);
-                  //console.log("value_topics_index[index]="+value_topics_index[index]);
                   profile_pie_topics=profile_pie_topics+value_topics[index]*value_topics_index[index];
                   console.log("profile_pie_topics= "+profile_pie_topics);
                 }
               }
 
-              //for(let i=0;i<this.visitorOn.confs.length;i++){
-                //if(JSON.stringify(this.confOn._id)===JSON.stringify(this.visitorOn.confs[i].confId)){
-                  //profilePieExist=this.visitorOn.confs[i].profile_pie;
-                  //console.log(profilePieExist);
-                //}
-              //}
               console.log("profile_pie_topics="+profile_pie_topics);
-              //profilePieExist=profilePieExist*0.6+profile_pie_topics*0.4;
               profile_pie_topics=profile_pie_topics*0.4;
               console.log("profile_pie_topics after * 0.4="+profile_pie_topics);
 
-              //console.log(profilePieExist);
               Visitor.update(
               {
                   "_id" :visitorid,
@@ -322,32 +306,12 @@ function updateProfilePie(visitorid,confid ,lecture1,lecture2,lecture3) {
                       //reject({"error": err});
                   }else{
                   console.log("success "+visitorid+" updated");
-                      //managerService.addRating(lecture1,lecture2,lecture3);
-                      //resolve(true);
                   }
               });
 
             });
       });
-    /*return new Promise((resolve, reject) => {
-          var conditions = {_id: ObjectId(visitorid)},
-          update = {'profile_pie':profilePie,
-                    'connection_percent':connection_percent,
-                    'explore_percent':explore_percent,
-                    'learn_percent':learn_percent
-                    },
-          opts = {new:true};
-          Visitor.update(conditions, update, opts,
-            (err) => {
-                if(err) {
-                  reject({"error": err});
-                  console.log('updateProfilePie STATUS: FAILED' + err);
-                } else{
-                  console.log(`updateProfilePie STATUS: SUCCESS`);
-                }
-            });
-          resolve(true);
-    });*/
+
 }
 
 function appendPrefferedLecture(visitorid,confid, lecture){
@@ -369,8 +333,6 @@ function appendPrefferedLecture(visitorid,confid, lecture){
             reject({"error": err});
         }else{
         console.log("success "+visitorid+" updated");
-            // managerService.addPreffered_lectures(visitorid,confid,lecture);
-            //managerService.addRating(lecture1,lecture2,lecture3);
             resolve(true);
         }
     });
@@ -471,9 +433,6 @@ function updatePreffered_lectures(visitorid,confid, lecture1,lecture2,lecture3) 
                       reject({"error": err});
                   }else{
                   console.log("success "+visitorid+" updated");
-                      //managerService.addPreffered_lectures(visitorid,confid,preffered_lectures);
-                      //updateProfilePie(visitorid,confid,lecture1,lecture2,lecture3);
-                      //managerService.addRating(lecture1,lecture2,lecture3);
                       resolve(true);
                   }
               });
@@ -481,7 +440,6 @@ function updatePreffered_lectures(visitorid,confid, lecture1,lecture2,lecture3) 
               }
             });
           });
-//console.log("this profile_pie_exist="+profile_pie_exist);
 
 
 }
@@ -539,52 +497,3 @@ function setTopics(visitorid,confid, topic1) {
     });
     });
 }
-/*function updatePreffered_lectures
-(visitorid,confid, lecture1,lecture2,lecture3) {
-  console.log("Trace: updatePreffered_lectures("+visitorid+") To conference id ("+confid+")");
-    var preffered_lectures=[];
-    preffered_lectures.push(lecture1);
-    preffered_lectures.push(lecture2);
-    preffered_lectures.push(lecture3);
-  return new Promise((resolve, reject) => {
-    let conf = getConfsVisitor(visitorid).then((confArray)=> {
-        for(let pIndex = 0; pIndex < confArray.length; pIndex++) {
-          if(conf[pIndex].confId === confid) {
-            console.log(`found conf`);
-            confArray[pIndex].preffered_lectures.push(preffered_lectures);
-            return;
-          }
-        }
-        confArray.save((err) => {
-          if(err){
-            console.log(`err: ${err}`);
-            resolve(false);
-            return;
-          }
-          else{
-            console.log(`Saved document`);
-            resolve("true");
-          }
-        });
-    });
-  });
-}
-
-function getConfsVisitor(visitorid){
-  return new Promise((resolve, reject) => {
-    console.log("visitor id: " + visitorid);
-    Visitor.findOne({_id: ObjectId(visitorid)},
-        (err, visitor) => {
-          if(err) {
-            console.log('getConfsVisitor STATUS: FAILED');
-            reject(err);
-          }
-          console.log('getConfsVisitor STATUS: SUCCESS');
-          if(!lct) {
-            console.log("info : wrong visitor id");
-            return resolve("info : wrong visitor id");
-          }
-          resolve(visitor.confs);
-        });
-  });
-}*/

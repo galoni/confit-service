@@ -18,6 +18,7 @@ router.post('/getVisitorById', getVisitorById);
 router.post('/setTopics', setTopics);
 router.post('/appendTopic', appendTopic);
 router.post('/updatePercent', updatePercent);
+router.post('/matching', matching);
 
 module.exports = router;
 
@@ -37,8 +38,9 @@ function getVisitorById(req, res){
         });
 }
 
+
 function matching(req, res){
-    visitorService.matching(req.body.visitorid, req.body.conferenceid)
+    visitorService.matchingPeople(req.body.visitorid, req.body.confid)
         .then(function (visitors) {
             if (visitors) {
                 console.log("visitors:" + visitors);
@@ -52,6 +54,7 @@ function matching(req, res){
             res.status(400).send(err);
         });
 }
+
 
 function createVisitor(req, res) {
   visitorService.createVisitor(req.body.first_name, req.body.last_name,req.body.linkdin,req.body.education,req.body.occupation)
