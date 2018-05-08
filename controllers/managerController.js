@@ -26,7 +26,7 @@ router.post('/getAllLecturesByTopic', getAllLecturesByTopic);
 router.post('/getLectureById', getLectureById);
 router.post('/getManagerById', getManagerById);
 router.post('/getAllConfById', getAllConfById);
-
+router.post('/removeConf', removeConf);
 
 // router.post('/login', login);
 // router.post('/register', register);
@@ -75,8 +75,9 @@ function createConference(req, res) {
   let location      = req.body.location;
   let audience      = req.body.audience;
   let main_topics   = req.body.main_topics;
+  let managerId     = req.body.managerId;
   console.log("data: " +main_topics);
-  managerService.createConference(name, type, logo, start_date, duration, location, audience, main_topics)
+  managerService.createConference(name, type, logo, start_date, duration, location, audience, main_topics, managerId)
       .then(function(status) {
           res.status(200).json(status);
       })
@@ -319,6 +320,18 @@ function createProgram(req, res){
         });
 }
 
+function removeConf(req, res) {
+  let confId      = req.body.confId;
+  let managerId = req.body.managerId;
+  managerService.removeConf(confId, managerId)
+    .then(function(status) {
+        res.status(200).json(status);
+    })
+    .catch(function (err) {
+        res.status(400).send(err);
+    });
+}
+
 function login(req, res) {
     userService.login(req.body.username, req.body.password)
         .then(function (user) {
@@ -345,41 +358,6 @@ function register(req, res) {
         });
 }
 
-function getPrefById(req, res) {
-    userService.getPrefById(req.body.id)
-        .then(function (pref) {
-            if (pref) {
-                res.send(pref);
-            } else {
-                res.sendStatus(404);
-            }
-        })
-        .catch(function (err) {
-            res.status(400).send(err);
-        });
-}
-
-function setPref(req, res) {
-    userService.setPref(req.body.id, req.body.update)
-        .then(function (pref) {
-          res.send(pref);
-        })
-        .catch(function (err) {
-          console.log("setPref error:" + err);
-          res.status(400).send(err);
-        });
-}
-
-function _delete(req, res) {
-    userService.delete(req.params._id)
-        .then(function () {
-            res.sendStatus(200);
-        })
-        .catch(function (err) {
-            res.status(400).send(err);
-        });
-}
-
 function checkSignIn(req, res, next){
    if (!req.session.user ) {
     console.log("checkSignIn.: NOT");
@@ -395,69 +373,4 @@ function logout(req, res){
       console.log("user logged out.");
    });
    res.redirect('/users/login');
-}
-
-function addTrackToPlaylist(req, res) {
-  let trackId     = req.body.trackId;
-  let userId      = req.body.userId;
-  let playlistName = req.body.playlistName;
-  userService.addTrackToPlaylist(trackId, userId, playlistName)
-    .then(function(status) {
-        res.status(200).json({"status": status});
-    })
-    .catch(function (err) {
-        res.status(400).send(err);
-    });
-}
-
-function addNewPlaylist(req, res) {
-  let userId      = req.body.userId;
-  let playlistName = req.body.playlistName;
-  userService.addNewPlaylist(userId, playlistName)
-    .then(function(status) {
-        res.status(200).json({"status": status});
-    })
-    .catch(function (err) {
-        res.status(400).send(err);
-    });
-}
-
-function removeTrackFromPlaylist(req, res) {
-  let trackId     = req.body.trackId;
-  let userId      = req.body.userId;
-  let playlistName = req.body.playlistName;
-  userService.removeTrackFromPlaylist(trackId, userId, playlistName)
-    .then(function(status) {
-        res.status(200).json({"status": status});
-    })
-    .catch(function (err) {
-        res.status(400).send(err);
-    });
-}
-
-function removePlaylist(req, res) {
-  let userId      = req.body.userId;
-  let playlistName = req.body.playlistName;
-  userService.removePlaylist(userId, playlistName)
-    .then(function(status) {
-        res.status(200).json({"status": status});
-    })
-    .catch(function (err) {
-        res.status(400).send(err);
-    });
-}
-
-function getPlaylistsById(req, res){
-    userService.getPlaylistsById(req.body.id)
-        .then(function (playlists) {
-            if (playlists) {
-                console.log("playlists:" + playlists);
-                res.send(playlists);
-            } else {
-                res.sendStatus(404);
-            }
-        })
-        .catch(function (err) {
-            res.status(400).send(err);
-        });
 }
