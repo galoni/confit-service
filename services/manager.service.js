@@ -30,6 +30,7 @@ service.getLectureById          = getLectureById;
 service.createManager           = createManager;
 service.getManagerById          = getManagerById;
 service.getAllConfById          = getAllConfById;
+service.removeConf              = removeConf;
 
 module.exports = service;
 
@@ -85,33 +86,33 @@ function addVisitorTocConf(visitorid, confid){
         console.log("success "+confid+" updated");
         }
     }
-);
+  );
 }
 
 function addPreffered_lectures(visitorid, confid,preffered_lectures){
   console.log("preffered_lectures"+preffered_lectures);
   console.log('Trace: addPreffered_lecturesToConf('+visitorid+','+confid+')');
   preffered_lectures.forEach(function(lecture) {
-  addRating(lecture,confid);
-});
+      addRating(lecture,confid);
+    });
   Conf.update(
-  {
-      "_id" :confid,
-      "visitors.visitorid": visitorid
-  },
-  {
-      "$set": {
-          "visitors.$.preffered_lectures": preffered_lectures
-      }
-  },
-    function(err, doc) {
-        if(err){
-        console.log(err);
-        }else{
-        console.log("success "+confid+" updated");
+      {
+          "_id" :confid,
+          "visitors.visitorid": visitorid
+      },
+      {
+          "$set": {
+              "visitors.$.preffered_lectures": preffered_lectures
+          }
+      },
+        function(err, doc) {
+            if(err){
+            console.log(err);
+            }else{
+            console.log("success "+confid+" updated");
+            }
         }
-    }
-);
+    );
 }
 
 function addRating(lecture1,confid){
@@ -136,41 +137,6 @@ function addRating(lecture1,confid){
 );
 }
 
-
-// function createSession(name, session_type, duration){
-//   return new Promise((resolve, reject) => {
-//     confSession.findOne({name : name},
-//       (err, _cSession) => {
-//         if (err){
-//           console.log("error: " + err);
-//           reject("error");
-//         }
-//         if(_cSession) {
-//             console.log("info : exist NAME");
-//             return resolve("error : exist NAME");
-//         }
-//         else{
-//           console.log('Trace: createSession('+name+','+session_type+')');
-//           let newSession = new confSession({
-//             name : name,
-//             session_type : session_type,
-//             duration : duration
-//           });
-//           console.log('CREATE SESSION STATUS: SUCCESS ' + name);
-//           newSession.save((err, confSession) => {
-//             if (err){
-//               console.log("error: " + err);
-//               reject("errorr");
-//             }
-//             else{
-//               console.log("new session: " + confSession);
-//               resolve(confSession);
-//             }
-//           })
-//         }
-//       })
-//   });
-// }
 
 function createConference(name, type, logo, start_date, duration, location, audience, main_topics, managerId){
   return new Promise((resolve, reject) => {
@@ -573,7 +539,6 @@ function getAllConfs(){
     });
 }
 
-
 function addManyLectures(confLectures, confId){
     console.log('Trace: addManyLectures('+confLectures+','+confId+')');
     return new Promise((resolve, reject) => {
@@ -651,104 +616,27 @@ function addConfToManager(managerId, confId){
         console.log("success "+confId+" updated");
         }
     }
-);
+  );
 }
 
-function addNewPlaylist(userId, playlistName){
-  console.log('Trace: addTrackToPlaylist('+userId+','+playlistName+')');
-  return new Promise((resolve, reject) => {
-    let user = getUserById(userId).then((user)=> {
-      user.playlists.push({"name":playlistName, "tracks":[]});
-      user.save((err) => {
-        if(err){
-          console.log(`err: ${err}`);
-          resolve(false);
-          return;
-        }
-        else
-          console.log(`Saved document: ${user.username}`);
-      });
-    resolve(true);
+function removeConf(confId, managerId) {
+  console.log('Trace: removeConf('+confId+','+managerId+')');
+  return new Promise((resolve,reject) => {
+    Conf.remove({ _id: ObjectId(confId) }, function (err) {
+      if (err) return handleError(err);
+      else console.log('Removed!');
     });
-  });
-}
-
-function create(username, password){
-    var preferences = [];
-    preferences.push({"name":"detriot","value":0});
-    preferences.push({"name":"hard","value":0});
-    preferences.push({"name":"dance","value":0});
-    preferences.push({"name":"minimal","value":0});
-    preferences.push({"name":"classic","value":0});
-    preferences.push({"name":"house","value":0});
-    preferences.push({"name":"vgm","value":0});
-    preferences.push({"name":"hard_acid","value":0});
-    preferences.push({"name":"electro","value":0});
-    return new Promise((resolve, reject) => {
-      User.findOne({username: username},
-        (err, user) => {
-          if(err) {
-            reject({"error": err});
-            console.log('REGISTER STATUS: FAILED');
-          }
-
-          if(user) {
-            console.log("info : exist username");
-            return resolve({"info": " exist username"});
-          }
-          else{
-            console.log('REGISTER STATUS: SUCCESS ' + username);
-            var newUser = new User({
-              username : username,
-              password : password,
-              preferences : preferences
-            });
-            newUser.save(
-              (err) => {
-                if(err)
-                  console.log('error: ' + err);
-                else
-                  console.log("save new user");
-                  resolve();
-              });
+    Manager.findByIdAndUpdate(managerId,{$pull: {confs: {confId: ObjectId(confId)}}},
+        function(err, doc) {
+            if(err){
+                console.log(err);
+                reject(err);
+            }else{
+                console.log("success "+confId+" updated");
+                resolve(doc);
+            }
         }
-    });
-  });
-}
-
-
-function getUserById(userId){
-  return new Promise((resolve, reject) => {
-    User.findOne({_id: ObjectId(userId)},
-        (err, user) => {
-          if(err) {
-            reject(err);
-            console.log('getUser STATUS: FAILED');
-          }
-          console.log('getUser STATUS: SUCCESS');
-          if(!user) {
-            console.log("info : wrong username");
-            return resolve(err);
-          }
-          resolve(user);
-        });
-  });
-}
-function getUser(userId){
-  return new Promise((resolve, reject) => {
-    User.findOne({_id: ObjectId(userId)},
-        (err, user) => {
-          if(err) {
-            reject(err);
-            console.log('getUser STATUS: FAILED');
-          }
-          console.log('getUser STATUS: SUCCESS');
-          if(!user) {
-            console.log("info : wrong username");
-            return resolve(err);
-          }
-          resolve(user);
-        });
+    );
   });
 }
 
@@ -777,150 +665,4 @@ function login(username, password){
             });
         });
     });
-}
-function getPrefById(userId){
-  console.log("Trace: getPrefById("+userId+")");
-  return new Promise((resolve, reject) => {
-    User.findOne({_id: ObjectId(userId)},
-      (err, user) => {
-        if(err) {
-          console.log('getPrefById STATUS: FAILED');
-          reject({"error": err});
-        }
-        console.log('getPrefById STATUS: SUCCESS');
-        if(!user) {
-          console.log("info : wrong username");
-          return resolve({"info": " wrong username"});
-        }
-        resolve(user.preferences);
-      });
-  });
-}
-function setPref(userId, userParam) {
-  console.log("Trace: setPrefById("+userId+")");
-    return new Promise((resolve, reject) => {
-          var obj = JSON.parse(userParam);
-          var conditions = {_id: ObjectId(userId)},
-          update = {'preferences.0.value':obj[0].value,
-                    'preferences.1.value':obj[1].value,
-                    'preferences.2.value':obj[2].value,
-                    'preferences.3.value':obj[3].value,
-                    'preferences.4.value':obj[4].value,
-                    'preferences.5.value':obj[5].value,
-                    'preferences.6.value':obj[6].value,
-                    'preferences.7.value':obj[7].value,
-                    'preferences.8.value':obj[8].value,
-                    },
-          opts = {new:true};
-          User.update(conditions, update, opts,
-            (err) => {
-                if(err) {
-                  reject({"error": err});
-                  console.log('updatePREF STATUS: FAILED' + err);
-                } else{
-                  console.log(`updatePREF STATUS: SUCCESS`);
-                }
-            });
-          resolve(obj);
-    });
-}
-
-function addTrackToPlaylist(trackId, userId, playlistName) {
-  console.log('Trace: addTrackToPlaylist('+trackId+','+userId+','+playlistName+')');
-  return new Promise((resolve, reject) => {
-    let user = getUserById(userId).then((user)=> {
-      user.playlists.forEach(function(pl) {
-        if(pl.name === playlistName){
-          ts.getTrackById(trackId).then ((trk) => {
-            pl.tracks.push(trk);
-            user.save((err) => {
-              if(err){
-                console.log(`err: ${err}`);
-                resolve(false);
-                return;
-              }
-              else
-                console.log(`Saved document: ${user.username}`);
-            });
-          });
-        }
-      });
-    resolve(true);
-    });
-  });
-}
-function removeTrackFromPlaylist(trackId, userId, playlistName) {
-  console.log('Trace: removeTrackFromPlaylist('+trackId+','+userId+','+playlistName+')');
-  return new Promise((resolve,reject) => {
-    let user = getUserById(userId).then((user)=> {
-      for(let pIndex = 0; pIndex < user.playlists.length; pIndex++) {
-        if(user.playlists[pIndex].name === playlistName) {
-          console.log(`found playlist: ${playlistName}`);
-          for(let tIndex = 0; tIndex < user.playlists[pIndex].tracks.length; tIndex++) {
-            if(user.playlists[pIndex].tracks[tIndex].name === trackId){
-              console.log(`found track in playlist`);
-              user.playlists[pIndex].tracks.splice(tIndex,1);
-              user.save((err) => {
-                if(err) {
-                  console.log(`err: ${err}`);
-                  resolve(false);
-                  return;
-                }
-                else {
-                  console.log(`Saved document: ${user.username}`);
-                  resolve(true);
-                  return;
-                }
-              });
-            }
-          }
-        }
-      }
-    });
-    resolve(false);
-  });
-}
-
-function removePlaylist(userId, playlistName) {
-  console.log('Trace: removePlaylist('+userId+','+playlistName+')');
-  return new Promise((resolve,reject) => {
-    let user = getUserById(userId).then((user)=> {
-      for(let pIndex = 0; pIndex < user.playlists.length; pIndex++) {
-        if(user.playlists[pIndex].name === playlistName) {
-          console.log(`found playlist: ${playlistName}`);
-          user.playlists.splice(pIndex,1);
-          user.save((err) => {
-            if(err) {
-              console.log(`err: ${err}`);
-              resolve(false);
-              return;
-            }
-            else {
-              console.log(`Saved document: ${user.username}`);
-              return resolve(true);
-            }
-          });
-        }
-      }
-    });
-    resolve(false);
-  });
-}
-function getPlaylistsById(userId){
-  console.log("Trace: getPlaylistsById("+userId+")");
-  return new Promise((resolve, reject) => {
-    User.findOne({_id: ObjectId(userId)},
-      (err, user) => {
-        if(err) {
-          console.log('getPlaylistsById STATUS: FAILED');
-          reject({"error": err});
-        }
-        if(!user) {
-          console.log("info : wrong username");
-          return resolve({"info": " wrong username"});
-        }
-        console.log('getPlaylistsById STATUS: SUCCESS');
-        resolve(user.playlists);
-      });
-  });
 }
