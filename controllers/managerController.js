@@ -451,5 +451,3 @@ function sendNotification(req, res) {
             res.status(400).send(err);
         });
 }
-=======
->>>>>>> origin/master
