@@ -18,8 +18,12 @@ router.post('/getVisitorById', getVisitorById);
 router.post('/setTopics', setTopics);
 router.post('/appendTopic', appendTopic);
 router.post('/updatePercent', updatePercent);
+router.post('/matching', matching);
 
 module.exports = router;
+
+
+
 
 function getVisitorById(req, res){
     visitorService.getVisitorById(req.body.id)
@@ -37,8 +41,9 @@ function getVisitorById(req, res){
         });
 }
 
+
 function matching(req, res){
-    visitorService.matching(req.body.visitorid, req.body.conferenceid)
+    visitorService.matchingPeople(req.body.visitorid, req.body.confid)
         .then(function (visitors) {
             if (visitors) {
                 console.log("visitors:" + visitors);
@@ -52,6 +57,7 @@ function matching(req, res){
             res.status(400).send(err);
         });
 }
+
 
 function createVisitor(req, res) {
   visitorService.createVisitor(req.body.first_name, req.body.last_name,req.body.linkdin,req.body.education,req.body.occupation)
@@ -105,7 +111,7 @@ function appendTopic(req, res) {
 }
 
 function setTopics(req, res) {
-  visitorService.setTopics(req.body.visitorid, req.body.confid,req.body.topic1,req.body.topic2,req.body.topic3)
+  visitorService.setTopics(req.body.visitorid, req.body.confid,req.body.topic1)
       .then(function(status) {
           res.status(200).json({"status": status});
       })
