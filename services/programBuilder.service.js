@@ -47,14 +47,14 @@ function buildProgram(confId) {
                       sortProgram[sIndex].lectures.push(topicsLectures[tIndex][lIndex]);
                       conf.lectures.some(function (lct, lctindex){
                         if (topicsLectures[tIndex][lIndex]._id === lct._id){
-                          lct.session_id = sortProgram[sIndex].session_id;
+                          conf.lectures[lctindex].session_id = sortProgram[sIndex].session_id;
                           return true;
                         }
                       })
                   }
                   lIndex++;
                   if (lIndex === topicsLectures[tIndex].length) {
-                      conf.program = Program;
+                      conf.program = sortProgram;
                       conf.save((err, cngObj) => {
                           if (err) {
                               reject({
