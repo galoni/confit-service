@@ -1,5 +1,6 @@
 const managerService = require('./manager.service');
 const pathBuilder = require('./pathBuilder.service');
+var uniqid = require('uniqid');
 
 let service = {};
 
@@ -29,6 +30,7 @@ function buildProgram(confId) {
       let spLength =  sortProgram.length;
       for (let sIndex = 0; sIndex < spLength; sIndex++){ //clear the lectures array
         sortProgram[sIndex].lectures = [];
+        sortProgram[sIndex].session_id = uniqid();
       }
       for (let tIndex = 0; tIndex < topics.length; tIndex++) {//outer loop iterate over topic
           let lIndex = 0;
@@ -43,10 +45,16 @@ function buildProgram(confId) {
                   if (topicsLectures[tIndex][lIndex] != null) {
                       // console.log('Trace: topicsLectures ' + JSON.stringify(topicsLectures[tIndex][lIndex]));
                       sortProgram[sIndex].lectures.push(topicsLectures[tIndex][lIndex]);
+                      conf.lectures.some(function (lct, lctindex){
+                        if (topicsLectures[tIndex][lIndex]._id === lct._id){
+                          lct.session_id = sortProgram[sIndex].session_id;
+                          return true;
+                        }
+                      })
                   }
                   lIndex++;
                   if (lIndex === topicsLectures[tIndex].length) {
-                      conf.program = sortProgram;
+                      conf.program = Program;
                       conf.save((err, cngObj) => {
                           if (err) {
                               reject({

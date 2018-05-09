@@ -4,6 +4,7 @@ const managerService = require('../services/manager.service');
 const programBuilderService = require('../services/programBuilder.service');
 // var session = require('express-session');
 const Manager = require('../models/managerSchema');
+const FCMService = require ('../services/fcm.service');
 const consts = require('../consts.js');
 
 // routes
@@ -26,6 +27,7 @@ router.post('/getAllLecturesByTopic', getAllLecturesByTopic);
 router.post('/getLectureById', getLectureById);
 router.post('/getManagerById', getManagerById);
 router.post('/getAllConfById', getAllConfById);
+router.post('/sendNotification', sendNotification);
 
 
 // router.post('/login', login);
@@ -456,6 +458,16 @@ function getPlaylistsById(req, res){
             } else {
                 res.sendStatus(404);
             }
+        })
+        .catch(function (err) {
+            res.status(400).send(err);
+        });
+}
+
+function sendNotification(req, res) {
+    FCMService.sendNotification()
+        .then(function(status) {
+            res.status(200).json({"status": status});
         })
         .catch(function (err) {
             res.status(400).send(err);
