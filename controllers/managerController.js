@@ -376,7 +376,6 @@ function logout(req, res){
    });
    res.redirect('/users/login');
 }
-<<<<<<< HEAD
 
 function addTrackToPlaylist(req, res) {
   let trackId     = req.body.trackId;
