@@ -21,7 +21,6 @@ app.use(
             "Origin, X-Requested-With, Content-Type, Accept");
         next();
 });
-
 app.get('/', (req,res) => {
   console.log('Trace: default Address');
 });
