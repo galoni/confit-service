@@ -10,7 +10,8 @@ let mongoose = require (`mongoose`),
 
         current_mode:{type: String},
         confs: [],
-        qr_code: {type: String}
+        qr_code: {type: String},
+        profilePic: {type: String}
     });
 
 module.exports = mongoose.model(`visitor`, visitorSchema);

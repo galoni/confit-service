@@ -1,6 +1,11 @@
 var express = require('express');
 var router = express.Router();
+let multer = require('multer');
+let upload = multer({
+  storage: multer.memoryStorage()
+});
 var qrcodeService = require('../services/qrcodeService');
+var imagesS3Service = require('../services/imagesS3Service');
 var consts = require('../consts.js');
 var AWS = require('aws-sdk');
 var s3 = new AWS.S3({
@@ -23,6 +28,8 @@ router.post('/create_string_qrcode', create_string_qrcode);
 router.post('/delete_image_qrcode', delete_image_qrcode);
 router.get('/get_image_qrcode', get_image_qrcode);
 router.post('/get_multiple_images', get_multiple_images);
+router.post('/upload_image', upload.single('data'), upload_image);
+router.post('/', get_multiple_images);
 module.exports = router;
 
 //create a QR Code String and returns qr code as string
@@ -49,6 +56,20 @@ function create_image_qrcode(req, res) {
     .catch(function(err) {
       res.status(400).send(err);
     });
+}
+
+//create a QR Code image and returns filename
+function upload_image(req, res) {
+  imagesS3Service.uploadImagePromise(req.file, req.body.id, req.body.type)
+.then(function(status) {
+    res.status(200).json({
+      "status": status
+    });
+  })
+  .catch(function(err) {
+    res.status(400).send(err);
+  });
+
 }
 //delete a QR Code image and returns true or false
 function delete_image_qrcode(req, res) {
