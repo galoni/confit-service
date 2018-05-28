@@ -19,7 +19,7 @@ service.appendTopic=appendTopic;
 service.appendPrefferedLecture=appendPrefferedLecture;
 service.updatePercent=updatePercent;
 service.matchingPeople=matchingPeople;
-
+service.login = login;
 
 module.exports = service;
 
@@ -72,28 +72,30 @@ function matchingPeople(visitorid,confid){
 }
 
 
-function createVisitor(first_name,last_name, linkdin, education, occupation){
+function createVisitor(email, password, firstName, lastName, linkedin, education, occupation){
   return new Promise((resolve, reject) => {
-    Visitor.findOne({linkdin : linkdin},
+    Visitor.findOne({linkedin : linkedin},
       (err, visitor) => {
         if (err){
           console.log("error: " + err);
           reject("error");
         }
         if(visitor) {
-            console.log("info : exist linkdin profile");
+            console.log("info : exist linkedin profile");
             return resolve(false);
         }
         else{
-          console.log('Trace: createVisitor('+first_name+','+last_name+')');
+          console.log('Trace: createVisitor('+firstName+','+lastName+')');
           var newVisitor = new Visitor({
-              name :{first_name:first_name,last_name:last_name},
-              linkedin : linkdin,
+              name :{first_name:firstName,last_name:lastName},
+              email : email,
+              password : password,
+              linkedin : linkedin,
               education : education,
               occupation : occupation,
               qr_code : ''
           });
-          console.log('createVisitor STATUS: SUCCESS ' + first_name);
+          console.log('createVisitor STATUS: SUCCESS ' + firstName);
           newVisitor.save((err, visitor) => {
             if (err){
               console.log("error: " + err);
@@ -462,5 +464,27 @@ function setTopics(visitorid,confid, topic1) {
             resolve(true);
         }
     });
+    });
+}
+function login(email, password){
+    return new Promise((resolve, reject) => {
+        Visitor.findOne({email: email},
+            (err, user) => {
+                if(err) {
+                    reject({"error": err});
+                    console.log('LOGIN STATUS: FAILED');
+                }
+
+                if(!user) {
+                    console.log("info : wrong email");
+                    return resolve({"info": " wrong email"});
+                }
+                if(!(user.password === password)) {
+                    console.log("info : wrong password");
+                    return resolve({"info": " wrong password"});
+                }
+                console.log('LOGIN STATUS: SUCCESS ' + user.email);
+                resolve(user);
+            });
     });
 }

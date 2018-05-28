@@ -32,22 +32,6 @@ router.post('/login', login);
 router.post('/sendMessage', sendMessage);
 router.post('/subscribeToTopic', subscribeToTopic);
 
-
-// router.post('/login', login);
-// router.post('/register', register);
-// router.get('/logout', logout);
-// router.get('/getPrefById', checkSignIn, getPrefById);
-// router.post('/getPrefById', getPrefById);
-// router.post('/getPlaylistsById', getPlaylistsById);
-// router.post('/setPref', setPref);
-// router.post('/addTrackToPlaylist', addTrackToPlaylist);
-// router.post('/addNewPlaylist', addNewPlaylist);
-// router.post('/removePlaylist', removePlaylist);
-// router.delete('/:_id', _delete);
-// router.get('/login', function(req, res){
-//    res.send('login page');
-// });
-
 module.exports = router;
 
 function createManager(req, res) {

@@ -19,6 +19,7 @@ router.post('/setTopics', setTopics);
 router.post('/appendTopic', appendTopic);
 router.post('/updatePercent', updatePercent);
 router.post('/matching', matching);
+router.post('/login', login);
 
 module.exports = router;
 
@@ -60,7 +61,7 @@ function matching(req, res){
 
 
 function createVisitor(req, res) {
-  visitorService.createVisitor(req.body.first_name, req.body.last_name,req.body.linkdin,req.body.education,req.body.occupation)
+  visitorService.createVisitor(req.body.email, req.body.password, req.body.firstName, req.body.lastName,req.body.linkedin,req.body.education,req.body.occupation)
       .then(function(status) {
           res.status(200).json({"status": status});
       })
@@ -158,4 +159,20 @@ function buildPath(req, res) {
       .catch(function (err) {
           res.status(400).send(err);
       });
+}
+
+function login(req, res) {
+    visitorService.login(req.body.email, req.body.password)
+        .then(function (user) {
+            if (user) {
+                res.send(user);
+            } else {
+                // authentication failed
+                res.status(401).send('Username or password is f incorrect');
+            }
+        })
+        .catch(function (err) {
+            console.log("login error:" + err);
+            res.status(400).send(err);
+        });
 }
