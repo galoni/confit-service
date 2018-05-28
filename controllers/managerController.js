@@ -28,6 +28,7 @@ router.post('/getLectureById', getLectureById);
 router.post('/getManagerById', getManagerById);
 router.post('/getAllConfById', getAllConfById);
 router.post('/removeConf', removeConf);
+router.post('/login', login);
 
 
 // router.post('/login', login);
@@ -48,11 +49,27 @@ router.post('/removeConf', removeConf);
 module.exports = router;
 
 function createManager(req, res) {
-    managerService.createManager(req.body.first_name, req.body.last_name,req.body.linkdin,req.body.education,req.body.occupation)
+    managerService.createManager(req.body.email, req.body.password, req.body.firstName, req.body.lastName,req.body.linkedin,req.body.education,req.body.occupation)
         .then(function(status) {
             res.status(200).json({"status": status});
         })
         .catch(function (err) {
+            res.status(400).send(err);
+        });
+}
+
+function login(req, res) {
+    managerService.login(req.body.email, req.body.password)
+        .then(function (user) {
+            if (user) {
+                res.send(user);
+            } else {
+                // authentication failed
+                res.status(401).send('Username or password is f incorrect');
+            }
+        })
+        .catch(function (err) {
+            console.log("login error:" + err);
             res.status(400).send(err);
         });
 }
@@ -334,31 +351,6 @@ function removeConf(req, res) {
     });
 }
 
-function login(req, res) {
-    userService.login(req.body.username, req.body.password)
-        .then(function (user) {
-            if (user) {
-              res.send(user);
-            } else {
-                // authentication failed
-                res.status(401).send('Username or password is f incorrect');
-            }
-        })
-        .catch(function (err) {
-            console.log("login error:" + err);
-            res.status(400).send(err);
-        });
-}
-
-function register(req, res) {
-    userService.create(req.body.username, req.body.password)
-        .then(function () {
-            login(req, res);
-        })
-        .catch(function (err) {
-            res.status(400).send(err);
-        });
-}
 
 function checkSignIn(req, res, next){
    if (!req.session.user ) {

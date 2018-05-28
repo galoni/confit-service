@@ -7,6 +7,8 @@ let mongoose = require (`mongoose`),
         linkedin: {type: String,required: true},
         education: {type: String,required: true},
         occupation:{type: String,required: true},
+        email:{type: String,required: true},
+        password:{type: String,required: true},
         confs: [],
     });
 

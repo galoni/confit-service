@@ -31,30 +31,33 @@ service.createManager           = createManager;
 service.getManagerById          = getManagerById;
 service.getAllConfById          = getAllConfById;
 service.removeConf              = removeConf;
+service.login                   = login;
 
 module.exports = service;
 
-function createManager(first_name,last_name, linkdin, education, occupation){
+function createManager(email, password, firstName, lastName, linkedin, education, occupation){
     return new Promise((resolve, reject) => {
-        Manager.findOne({linkdin : linkdin},
+        Manager.findOne({linkedin : linkedin},
             (err, manager) => {
                 if (err){
                     console.log("error: " + err);
                     reject("error");
                 }
                 if(manager) {
-                    console.log("info : exist linkdin profile");
+                    console.log("info : exist linkdin profile: " + manager);
                     return resolve("info : exist linkdin profile");
                 }
                 else{
-                    console.log('Trace: createManager('+first_name+','+last_name+')');
+                    console.log('Trace: createManager('+firstName+','+lastName+')');
                     let newManager = new Manager({
-                        name :{first_name:first_name,last_name:last_name},
-                        linkedin : linkdin,
+                        name :{first_name:firstName,last_name:lastName},
+                        email : email,
+                        password : password,
+                        linkedin : linkedin,
                         education : education,
                         occupation : occupation,
                     });
-                    console.log('createManager STATUS: SUCCESS ' + first_name);
+                    console.log('createManager STATUS: SUCCESS ' + firstName);
                     newManager.save((err, manager) => {
                         if (err){
                             console.log("error: " + err);
@@ -640,9 +643,9 @@ function removeConf(confId, managerId) {
   });
 }
 
-function login(username, password){
+function login(email, password){
     return new Promise((resolve, reject) => {
-      User.findOne({username: username},
+      Manager.findOne({email: email},
         (err, user) => {
           if(err) {
             reject({"error": err});
@@ -650,19 +653,15 @@ function login(username, password){
           }
 
           if(!user) {
-            console.log("info : wrong username");
-            return resolve({"info": " wrong username"});
+            console.log("info : wrong email");
+            return resolve({"info": " wrong email"});
           }
           if(!(user.password === password)) {
             console.log("info : wrong password");
             return resolve({"info": " wrong password"});
           }
-          console.log('LOGIN STATUS: SUCCESS ' + user.username);
-          resolve({
-                _id: user._id,
-                username: user.username,
-                token: jwt.sign({ sub: user._id }, consts.secret)
-            });
+          console.log('LOGIN STATUS: SUCCESS ' + user.email);
+          resolve(user);
         });
     });
 }
