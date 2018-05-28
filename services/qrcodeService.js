@@ -3,10 +3,12 @@ var uuid = require('node-uuid');
 const fs = require('fs');
 const consts = require('../consts');
 var AWS = require('aws-sdk');
-var s3 = new AWS.S3({
-  accessKeyId: process.env.S3_KEY,
-  secretAccessKey: process.env.S3_SECRET
-});
+AWS.config.update(
+  {
+    accessKeyId: process.env.S3_KEY,
+    secretAccessKey: process.env.S3_SECRET
+  });
+var s3 = new AWS.S3();
 var join = require('path').join;
 var s3Zip = require('s3-zip');
 
@@ -144,11 +146,13 @@ function getImage(fileKey, cb) {
 
 //zip conference
 function get_multiple_images(confId) {
-  console.log(confId);
   var Manager = require('./manager.service');
+  console.log("service: " + confId);
+
   return new Promise((resolve, reject) => {
     let _program = Manager.getConfById(confId)
       .then((conf) => {
+        console.log(conf);
         if (conf) {
           console.log("searching for " + conf.name + '.zip');
           var params = {
@@ -166,13 +170,16 @@ function get_multiple_images(confId) {
               var files = [];
               files.push(conf.qr_code);
               conf.lectures.forEach(function(lct) {
-                files.push(lct.qr_code);
+                if (lct.qr_code != undefined)
+                  files.push(lct.qr_code);
               });
               console.log(files);
+              console.log(process.env.S3_KEY);
               s3Zip
                 .archive({
                   region: region,
-                  bucket: bucket
+                  bucket: bucket,
+                  debug: true
                 }, null, files)
                 .pipe(output)
                 .on('finish', function() {
@@ -188,6 +195,7 @@ function get_multiple_images(confId) {
                   });
                 });
             } else {
+              console.log("else: " + params.Key.replace(" ", "%20"));
               resolve(params.Key.replace(" ", "%20"));
             }
           });
@@ -196,6 +204,9 @@ function get_multiple_images(confId) {
           reject("did not find conf");
         }
 
+      })
+      .catch((err) => {
+        console.log(err);
       });
   });
 };
