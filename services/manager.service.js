@@ -32,6 +32,7 @@ service.getManagerById          = getManagerById;
 service.getAllConfById          = getAllConfById;
 service.removeConf              = removeConf;
 service.login                   = login;
+service.addTopic              = addTopic;
 
 module.exports = service;
 
@@ -76,7 +77,7 @@ function createManager(email, password, firstName, lastName, linkedin, education
 
 function addVisitorTocConf(visitorid, confid){
   var visitor=[];
-  visitor.push({"visitorid":visitorid,"preffered_lectures":[]});
+  visitor.push({"visitorid":visitorid,"preffered_lectures":[],"mainTopic":""});
 
   console.log('Trace: addVisitorTocConf('+visitorid+','+confid+')');
     Conf.findByIdAndUpdate(confid,
@@ -106,6 +107,29 @@ function addPreffered_lectures(visitorid, confid,preffered_lectures){
       {
           "$set": {
               "visitors.$.preffered_lectures": preffered_lectures
+          }
+      },
+        function(err, doc) {
+            if(err){
+            console.log(err);
+            }else{
+            console.log("success "+confid+" updated");
+            }
+        }
+    );
+}
+
+function addTopic(visitorid, confid,mainTopic){
+  console.log("addTopic"+mainTopic);
+  console.log('Trace: addTopic('+visitorid+','+mainTopic+')');
+  Conf.update(
+      {
+          "_id" :confid,
+          "visitors.visitorid": visitorid
+      },
+      {
+          "$set": {
+              "visitors.$.mainTopic": mainTopic
           }
       },
         function(err, doc) {

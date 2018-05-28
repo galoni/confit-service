@@ -458,7 +458,7 @@ function setTopics(visitorid,confid, topic1) {
             reject({"error": err});
         }else{
         console.log("success "+visitorid+" updated");
-
+        managerService.addTopic(visitorid,confid,topic1);
             resolve(true);
         }
     });
