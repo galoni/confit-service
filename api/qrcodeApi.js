@@ -108,6 +108,7 @@ function get_image_qrcode(req, res) {
 }
 
 function get_multiple_images(req, res) {
+  console.log("qrcodeapi: " + req.body.confId);
   qrcodeService.get_multiple_images(req.body.confId)
     .then(function(status) {
       res.status(200).json({
