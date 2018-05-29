@@ -5,7 +5,6 @@ var confSession = require('../models/sessionSchema');
 var lecture     = require('../models/lectureSchema');
 var Conf        = require('../models/conferenceSchema');
 var qrcodeApi   = require('./qrcodeService')
-// var ts         = require('../services/track.service');
 const consts      = require('../consts.js');
 
 let service = {};
@@ -32,7 +31,7 @@ service.getManagerById          = getManagerById;
 service.getAllConfById          = getAllConfById;
 service.removeConf              = removeConf;
 service.login                   = login;
-service.addTopic              = addTopic;
+service.addTopic                = addTopic;
 
 module.exports = service;
 
