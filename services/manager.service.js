@@ -4,7 +4,8 @@ var Manager     = require('../models/managerSchema');
 var confSession = require('../models/sessionSchema');
 var lecture     = require('../models/lectureSchema');
 var Conf        = require('../models/conferenceSchema');
-var qrcodeApi   = require('./qrcodeService')
+var qrcodeApi   = require('./qrcodeService');
+var fileUpload   = require('./imagesS3Service');
 const consts      = require('../consts.js');
 
 let service = {};
@@ -177,11 +178,11 @@ function createConference(name, type, logo, start_date, duration, location, audi
             return resolve(false);
         }
         else{
-          console.log('Trace: createConference('+name+','+type+')');
+          console.log('Trace: createConference('+name+','+logo+')');
             let newConfernce = new Conf({
             name : name,
             type : type,
-            logo : logo,
+            logo : logo.filename,
             start_date : start_date,
             duration : duration,
             audience : audience,
@@ -196,6 +197,13 @@ function createConference(name, type, logo, start_date, duration, location, audi
               reject("error");
             }
             else{
+                fileUpload.uploadImagePromise(logo.value, cnf["_id"], 'logo', function(ans, err) {
+                    if(!ans){
+                        console.log("failed to create logo");
+                        reject(err);
+                    }
+                    console.log('ans: ' + ans);
+                })
               qrcodeApi.createImage(cnf["_id"],cnf["name"], 'conference', function(qr_code, err){
                 if (!qr_code){
                     console.log("failed to create qr_code");
