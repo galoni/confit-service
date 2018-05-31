@@ -93,7 +93,8 @@ function createVisitor(email, password, firstName, lastName, linkedin, education
               linkedin : linkedin,
               education : education,
               occupation : occupation,
-              qr_code : ''
+              qr_code : '',
+              profilePic:'41c9efe0-eea7-4387-9850-c6a1919d673d.png'
           });
           console.log('createVisitor STATUS: SUCCESS ' + firstName);
           newVisitor.save((err, visitor) => {
