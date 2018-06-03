@@ -133,12 +133,13 @@ function createVisitor(email, password, firstName, lastName, linkedin, education
 
 
 function registerToConf
-(visitorid, confid,confname) {
+(visitorid, confid, confname, logo) {
   console.log("Trace: registerToConf("+confid+") by visitor: ("+visitorid+")");
 
     var confs=[];
     confs.push({"confId":confid,
                 "confname":confname,
+                "logo": logo,
                "profile_pie":0,
                "preffered_lectures":[]})
       return new Promise((resolve, reject) => {

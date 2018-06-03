@@ -81,7 +81,7 @@ function updatePercent(req, res) {
 }
 
 function registerToConf(req, res) {
-  visitorService.registerToConf(req.body.visitorid, req.body.confid,req.body.confname)
+  visitorService.registerToConf(req.body.visitorid, req.body.confid, req.body.confname, req.body.logo)
       .then(function(status) {
           res.status(200).json({"status": status});
       })
