@@ -75,9 +75,9 @@ function createManager(email, password, firstName, lastName, linkedin, education
 }
 
 
-function addVisitorTocConf(visitorid, confid){
+function addVisitorTocConf(visitorid, confid,visitorname){
   var visitor=[];
-  visitor.push({"visitorid":visitorid,"preffered_lectures":[],"mainTopic":""});
+  visitor.push({"visitorid":visitorid,"preffered_lectures":[],"mainTopic":"","visitorname":visitorname});
 
   console.log('Trace: addVisitorTocConf('+visitorid+','+confid+')');
     Conf.findByIdAndUpdate(confid,

@@ -135,7 +135,7 @@ function createVisitor(email, password, firstName, lastName, linkedin, education
 function registerToConf
 (visitorid, confid, confname, logo) {
   console.log("Trace: registerToConf("+confid+") by visitor: ("+visitorid+")");
-
+  var visitorname;
     var confs=[];
     confs.push({"confId":confid,
                 "confname":confname,
@@ -145,6 +145,7 @@ function registerToConf
       return new Promise((resolve, reject) => {
       let visitor = getVisitorById(visitorid).then((visitor) => {
           console.log(visitor);
+          visitorname=visitor.name;
         for(let pIndex = 0; pIndex < visitor.confs.length; pIndex++) {
           if(visitor.confs[pIndex].confId === confid) {
             console.log(`found conf: ${visitor.confs[pIndex].confId}`);
@@ -160,7 +161,7 @@ function registerToConf
           }
           else{
             console.log(`Saved document: ${visitor._id}`);
-            managerService.addVisitorTocConf(visitorid,confid);
+            managerService.addVisitorTocConf(visitorid,confid,visitorname);
 
             resolve(true);
           }
