@@ -44,12 +44,13 @@ function matchingPeople(visitorid,confid){
               console.log("profilePie on conf found="+profilePie);
             }
           }
+
               Visitor.aggregate([
                 { $unwind :'$confs'},
                 {$match: {
                       $and: [
                           {'confs.confId': confid },
-                          {'confs.profile_pie': {$gt:profilePie-0.003, $lt:profilePie+0.003}}
+                          {'confs.profile_pie': {$gt:profilePie-0.09, $lt:profilePie+0.1}}
                       ]
                  }},
                 { $project : {matching:null,visitorfirstname:"$name.first_name",visitorlastname:"$name.last_name" ,confId : '$confs.confId', confName : '$confs.confname', profilePie : '$confs.profile_pie' } }

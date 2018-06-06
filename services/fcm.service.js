@@ -24,27 +24,35 @@ function sendMessage(topicName, msg_body) {
       notification: {
         title: 'Confit',
         body: msg_body,
+
       },
       android: {
         ttl: 3600 * 1000,
         notification: {
-          icon: 'stock_ticker_update',
+          icon: 'https://logo-storage.s3.amazonaws.com/confit_logo.png',
           color: '#f45342',
+          title: 'Confit',
+          body: msg_body,
         },
       },
       apns: {
         payload: {
           aps: {
             badge: 42,
+            title: 'Confit',
+            body: msg_body,
           },
         },
       },
       webpush: {
         data: {
           "name": "wrench"
+        },
+        notification: {
+          icon: 'https://logo-storage.s3.amazonaws.com/confit_logo.png',
         }
       },
-      topic: '/topics/' + topicName
+      topic: '/topics/' + topicName,
     };
 
     // Send a message to the device corresponding to the provided
