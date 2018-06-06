@@ -29,6 +29,7 @@ app.get('/', (req,res) => {
 app.use('/manager', require('./controllers/managerController'));
 app.use('/visitor', require('./controllers/visitorController'));
 app.use('/qrcodeApi', require('./api/qrcodeApi'));
+app.use('/push', require('./controllers/push_notificationController'));
 
 app.listen(port,
     () => {
