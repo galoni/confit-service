@@ -20,6 +20,7 @@ router.post('/appendTopic', appendTopic);
 router.post('/updatePercent', updatePercent);
 router.post('/matching', matching);
 router.post('/login', login);
+router.post('/getAllConfById', getAllConfById);
 
 module.exports = router;
 
@@ -173,6 +174,22 @@ function login(req, res) {
         })
         .catch(function (err) {
             console.log("login error:" + err);
+            res.status(400).send(err);
+        });
+}
+function getAllConfById(req, res) {
+    visitorService.getAllConfById(req.body.visitorId)
+        .then(function(confs) {
+            if (confs) {
+                console.log("done");
+                // console.log("confs:" + confs);
+                res.send(confs);
+            } else {
+                res.sendStatus(404);
+            }
+        })
+        .catch(function(err) {
+            console.log("error:" + err);
             res.status(400).send(err);
         });
 }

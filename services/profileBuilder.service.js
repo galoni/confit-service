@@ -20,6 +20,7 @@ service.appendPrefferedLecture=appendPrefferedLecture;
 service.updatePercent=updatePercent;
 service.matchingPeople=matchingPeople;
 service.login = login;
+service.getAllConfById = getAllConfById;
 
 module.exports = service;
 
@@ -489,5 +490,14 @@ function login(email, password){
                 console.log('LOGIN STATUS: SUCCESS ' + user.email);
                 resolve(user);
             });
+    });
+}
+
+function getAllConfById(visitorId) {
+    return new Promise((resolve, reject) => {
+        this.getVisitorById(visitorId).then((vstr) => {
+            console.log('confs: ' + vstr.confs);
+            resolve(vstr.confs);
+        })
     });
 }
