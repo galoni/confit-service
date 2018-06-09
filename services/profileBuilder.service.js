@@ -53,7 +53,7 @@ function matchingPeople(visitorid,confid){
                           {'confs.profile_pie': {$gt:profilePie-0.09, $lt:profilePie+0.1}}
                       ]
                  }},
-                { $project : {matching:null,visitorfirstname:"$name.first_name",visitorlastname:"$name.last_name" ,confId : '$confs.confId', confName : '$confs.confname', profilePie : '$confs.profile_pie' } }
+                { $project : {profilePic:"$profilePic",matching:null,visitorfirstname:"$name.first_name",visitorlastname:"$name.last_name" ,confId : '$confs.confId', confName : '$confs.confname', profilePie : '$confs.profile_pie' } }
                 ], function(err, result) {
                   if(err){console.log("error in aggregate");}
                   else{
