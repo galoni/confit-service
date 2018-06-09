@@ -33,6 +33,7 @@ service.getAllConfById          = getAllConfById;
 service.removeConf              = removeConf;
 service.login                   = login;
 service.addTopic                = addTopic;
+service.addTotalRating          = addTotalRating;
 
 module.exports = service;
 
@@ -162,6 +163,31 @@ function addRating(lecture1,confid){
         }
     }
 );
+}
+
+function addTotalRating(lectureId, incNum){
+    console.log('Trace: addTotalRating('+lectureId+')');
+    return new Promise((resolve, reject) => {
+        lecture.update(
+            {
+                "_id" :lectureId
+            },
+            {
+                "$inc": {
+                    "ratings": incNum
+                }
+            },
+            function(err, doc) {
+                if(err){
+                    console.log(err);
+                    reject(err);
+                }else{
+                    console.log("success "+lectureId+" updated");
+                    resolve(lectureId);
+                }
+            }
+        );
+    });
 }
 
 

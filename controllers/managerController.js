@@ -31,6 +31,7 @@ router.post('/removeConf', removeConf);
 router.post('/login', login);
 router.post('/sendMessage', sendMessage);
 router.post('/subscribeToTopic', subscribeToTopic);
+router.post('/addTotalRating', addTotalRating);
 
 module.exports = router;
 
@@ -234,6 +235,20 @@ function addSessionToConf(req, res) {
     .catch(function(err) {
       res.status(400).send(err);
     });
+}
+
+function addTotalRating(req, res) {
+    let lectureId = req.body.lectureId;
+    let incNum = req.body.incNum;
+    managerService.addTotalRating(lectureId, incNum)
+        .then(function(status) {
+            res.status(200).json({
+                "status": status
+            });
+        })
+        .catch(function(err) {
+            res.status(400).send(err);
+        });
 }
 
 function addLectureToConf(req, res) {
