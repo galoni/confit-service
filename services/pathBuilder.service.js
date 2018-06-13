@@ -23,10 +23,10 @@ function removeFromVisitorSchema(visitorId, confId, cb) {
   VisitorScehma.update(query, doc, function(err, raw) {
     if (err) {
       console.log(err);
-      cb("Could not delete Path from visitor " + visitorId);
     } else {
       console.log("deleted old path from " + visitorId);
     }
+    cb(err,raw);
   });
 }
 
@@ -41,15 +41,19 @@ function addToVisitorSchema(build, visitorId, confId, cb) {
     "confs.confId": confId
   }
   console.log(build);
-  removeFromVisitorSchema(visitorId, confId);
-  VisitorScehma.update(query, doc, function(err, raw) {
-    if (err) {
-      console.log(err);
-      cb("Could not add Path to visitor " + visitorId);
-    } else {
-      console.log("Added custome path to " + visitorId);
+  removeFromVisitorSchema(visitorId, confId, function(err, raw) {
+    if (raw){
+      VisitorScehma.update(query, doc, function(err, raw) {
+        if (err) {
+          console.log(err);
+          cb("Could not add Path to visitor " + visitorId);
+        } else {
+          console.log("Added custome path to " + visitorId);
+        }
+      });
     }
-  })
+  });
+
 }
 
 function insertByPref(build, conf, profile, elc_modes, matched, next) {
