@@ -122,6 +122,7 @@ function insertByTopic(build, conf, profile, elc_modes, matched, next) {
 function insertRest(build, program, profile, elc_modes,matched, next) {
   var selectedTopics = [];
   build.session_list.forEach(function(sess, index) {
+    console.log(sess.session.lectures[4]);
     if (selectedTopics.indexOf(sess.session.lectures[0].topic) === -1 && sess.elc_mode)
       selectedTopics.push(sess.session.lectures[0].topic);
   });
@@ -248,6 +249,8 @@ function buildPath(confId, visitorId) {
                     })
                   });
                   var matched = 0;
+                  console.log("Please pay attention to this:");
+                  console.log(build.session_list[3].lectures);
                   console.log("before building by pref: %j", elc_modes);
                   insertByPref(build, conf, profile, elc_modes, matched, function(newBuild, newelc_modes, newmatched, err) {
                       build = newBuild;
@@ -302,89 +305,3 @@ function buildPath(confId, visitorId) {
     });
 
   }
-  // function buildPath(confId, visitorId) {
-  //   return new Promise((resolve, reject) => {
-  //     console.log("------Building Path------");
-  //     let _visitor = Visitor.getVisitorById(visitorId)
-  //       .then(function(visitor_id) {
-  //         let _program = Manager.getConfById(confId)
-  //           .then(function(conf) {
-  //             if (conf) {
-  //               var program = conf["program"];
-  //             } else {
-  //               reject("no conf found");
-  //             }
-  //             if (visitor_id) {
-  //               var visitor = visitor_id;
-  //               var profile = visitor["confs"].find(function(element) {
-  //                 return element["confId"] == conf["_id"];
-  //               });
-  //               console.log(profile);
-  //               console.log("learn: " + profile["learn_percent"]);
-  //               console.log("length: " + conf["program"].length);
-  //               var elc_modes = {
-  //                 learn: profile["learn_percent"] * conf["program"].length,
-  //                 explore: profile["explore_percent"] * conf["program"].length,
-  //                 connect: profile["connection_percent"] * conf["program"].length,
-  //               }
-  //
-  //             } else {
-  //               reject("no visitor found");
-  //             }
-  //             var build = []
-  //             program.forEach(function(element, index) {
-  //               build.push({
-  //                 sessions: element,
-  //                 elc_mode: undefined
-  //               })
-  //
-  //             });
-  //             console.log("before building by pref: %j", elc_modes);
-  //             insertByPref(build, program, profile, elc_modes, function(newBuild, newelc_modes, err) {
-  //               build = newBuild;
-  //               elc_modes = newelc_modes;
-  //               console.log("after building by pref: %j", newelc_modes);
-  //               var sum_modes = elc_modes["learn"] + elc_modes["connect"] + elc_modes["explore"]
-  //               if (sum_modes > 0)
-  //                 insertByTopic(build, program, profile, elc_modes, function(newBuild, newelc_modes, err) {
-  //                   console.log("after building by topic: %j", newelc_modes);
-  //                   elc_modes = newelc_modes;
-  //                   build = newBuild;
-  //                   sum_modes = elc_modes["learn"] + elc_modes["connect"] + elc_modes["explore"]
-  //                   if (sum_modes > 0)
-  //                     insertRest(build, program, profile, elc_modes, function(newBuild, newelc_modes, err) {
-  //                       elc_modes = newelc_modes;
-  //                       console.log("after building by rest: %j", newelc_modes);
-  //                       build = newBuild;
-  //                       addToVisitorSchema(build, visitorId, confId, function(err) {
-  //                         if (err) reject(err);
-  //                       });
-  //                       resolve(build);
-  //                     });
-  //                   else {
-  //                     addToVisitorSchema(build, visitorId, confId, function(err) {
-  //                       if (err) reject(err);
-  //                     });
-  //                     resolve(build);
-  //                   }
-  //                 });
-  //               else {
-  //                 addToVisitorSchema(build, visitorId, confId, function(err) {
-  //                   if (err) reject(err);
-  //                 });
-  //                 resolve(build);
-  //               }
-  //             });
-  //
-  //
-  //
-  //           })
-  //           .catch(function(err) {
-  //             console.log("error:" + err);
-  //           });
-  //       })
-  //       .catch(function(err) {
-  //         console.log("error:" + err);
-  //       });
-  //
-  //   })

@@ -466,7 +466,7 @@ function getLectureById(lectureId){
           console.log('getLectureById STATUS: SUCCESS');
           if(!lct) {
             console.log("info : wrong lct id");
-            return resolve("info : wrong lct id");
+            return reject("info : wrong lct id");
           }
           resolve(lct);
         });
