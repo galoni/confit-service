@@ -2,6 +2,7 @@ var service = {};
 
 service.sendMessage = sendMessage;
 service.subscribeToTopic = subscribeToTopic;
+service.unsubscribeFromTopic = unsubscribeFromTopic;
 service.getMessagesByTopic = getMessagesByTopic;
 
 module.exports = service;
@@ -125,11 +126,32 @@ function subscribeToTopic(tokens, topic) {
         // See the MessagingTopicManagementResponse reference documentation
         // for the contents of response.
         console.log('Successfully subscribed to topic %s: %j', topic, response);
-        resolve('Successfully subscribed to topic: %j', response);
+        resolve(response);
       })
       .catch(function(error) {
         console.log('Error subscribing to topic:' + error);
         reject('Error subscribing to topic:' + error);
+      });
+  });
+}
+
+function unsubscribeFromTopic(tokens, topic) {
+  topic = topic.replace(/[^a-z0-9]/gi, '');
+  return new Promise((resolve, reject) => {
+    // Subscribe the devices corresponding to the registration tokens to the
+    // topic.
+    console.log("token to unsubscribe: " + tokens);
+    console.log("topic to unsubscribe: " + topic);
+    admin.messaging().unsubscribeFromTopic(tokens, topic)
+      .then(function(response) {
+        // See the MessagingTopicManagementResponse reference documentation
+        // for the contents of response.
+        console.log('Successfully unsubscribed from topic %s: %j', topic, response);
+        resolve(response);
+      })
+      .catch(function(error) {
+        console.log('Error unsubscribing from topic:' + error);
+        reject('Error unsubscribing from topic:' + error);
       });
   });
 }
