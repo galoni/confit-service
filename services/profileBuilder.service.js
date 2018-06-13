@@ -297,7 +297,7 @@ function appendPrefferedLecture(visitorid,confid, lecture){
         "confs.confId": confid
     },
     {
-        "$push": {
+        "$addToSet": {
             "confs.$.preffered_lectures": lecture
         }
     },
@@ -427,7 +427,7 @@ function appendTopic(visitorid, confid, topic){
         "confs.confId": confid
     },
     {
-        "$push": {
+        "$addToSet": {
             "confs.$.mainTopic": topic
         }
     },

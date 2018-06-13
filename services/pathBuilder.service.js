@@ -58,7 +58,7 @@ function insertByPref(build, conf, profile, elc_modes, matched, next) {
   });
   pref_lec.forEach(function(i) {
     build.session_list.forEach(function(sess, index) {
-      if (i.session_id === sess.session.session_id) {
+      if (i.session_id === sess.session.session_id && !sess.elc_mode) {
         let buffer = sess.session.lectures.filter(function(lec) {
           if (lec.topic == i.topic) {
             return 1
